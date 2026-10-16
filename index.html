@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Payas Days — Calendar</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+<!-- ====== TOP NAVIGATION ====== -->
+<header class="pd-header sticky-top">
+
+  <!-- Primary bar: brand | date nav | actions -->
+  <div class="pd-topbar">
+
+    <!-- Brand -->
+    <a class="pd-brand" href="#" id="brandHomeLink" title="Back to calendar">
+      <i class="fa-regular fa-calendar-days"></i>
+      <span class="pd-brand-text">Payas Days</span>
+      <em class="pd-brand-sub">Calendar</em>
+    </a>
+
+    <!-- Center: date navigation -->
+    <div class="pd-date-nav">
+      <button class="pd-arrow-btn" id="btnPrev" title="Previous (←)" aria-label="Previous">
+        <i class="fa-solid fa-chevron-left"></i>
+      </button>
+      <button class="pd-date-display" id="btnToday" title="Click to go to today" aria-label="Go to today">
+        <span id="navDateDisplay">Loading…</span>
+      </button>
+      <button class="pd-arrow-btn" id="btnNext" title="Next (→)" aria-label="Next">
+        <i class="fa-solid fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- Right actions -->
+    <div class="pd-topbar-actions">
+      <!-- Search toggle -->
+      <button class="pd-action-btn" id="btnSearch" title="Search events (/)">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </button>
+
+      <!-- Theme toggle -->
+      <button class="pd-action-btn pd-theme-btn" id="btnTheme" title="Toggle dark / light mode">
+        <span class="pd-theme-icon"><i class="fa-solid fa-moon"></i></span>
+      </button>
+
+      <!-- Desktop: page links -->
+      <div class="pd-page-links d-none d-lg-flex" role="navigation" aria-label="App pages">
+        <div class="pd-vdivider"></div>
+        <a class="pd-action-btn pd-page-link" href="#" data-page="settings" title="Settings">
+          <i class="fa-solid fa-gear"></i>
+          <span class="pd-action-label">Settings</span>
+        </a>
+        <a class="pd-action-btn pd-page-link" href="#" data-page="about" title="About">
+          <i class="fa-solid fa-circle-info"></i>
+          <span class="pd-action-label">About</span>
+        </a>
+        <a class="pd-action-btn pd-page-link" href="#" data-page="license" title="License">
+          <i class="fa-solid fa-file-lines"></i>
+          <span class="pd-action-label">License</span>
+        </a>
+      </div>
+
+      <!-- Mobile: hamburger -->
+      <button class="pd-action-btn pd-menu-btn d-lg-none" id="btnMobileMenu" title="Menu"
+              aria-expanded="false" aria-controls="pdMobileMenu">
+        <i class="fa-solid fa-bars" id="mobileMenuIcon"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Secondary bar: view tabs -->
+  <div class="pd-tabsbar" role="tablist" aria-label="Calendar views">
+    <div class="pd-tabs">
+      <button class="pd-view-btn active" data-view="month" role="tab" aria-selected="true">
+        <i class="fa-regular fa-calendar"></i>
+        <span>Month</span>
+      </button>
+      <button class="pd-view-btn" data-view="week" role="tab" aria-selected="false">
+        <i class="fa-solid fa-table-columns"></i>
+        <span>Week</span>
+      </button>
+      <button class="pd-view-btn" data-view="day" role="tab" aria-selected="false">
+        <i class="fa-regular fa-square"></i>
+        <span>Day</span>
+      </button>
+      <button class="pd-view-btn" data-view="agenda" role="tab" aria-selected="false">
+        <i class="fa-solid fa-list-ul"></i>
+        <span>Agenda</span>
+      </button>
+    </div>
+    <div class="pd-tabs-right">
+      <button class="pd-today-pill" id="btnTodayPill">Today</button>
+    </div>
+  </div>
+
+  <!-- Mobile slide-down menu -->
+  <div class="pd-mobile-menu" id="pdMobileMenu" aria-hidden="true">
+    <nav class="pd-mobile-nav">
+      <a class="pd-mobile-nav-item pd-page-link" href="#" data-page="settings">
+        <span class="pd-mobile-nav-icon"><i class="fa-solid fa-gear"></i></span>
+        <span class="pd-mobile-nav-label">Settings</span>
+        <i class="fa-solid fa-chevron-right pd-mobile-nav-arrow"></i>
+      </a>
+      <a class="pd-mobile-nav-item pd-page-link" href="#" data-page="about">
+        <span class="pd-mobile-nav-icon"><i class="fa-solid fa-circle-info"></i></span>
+        <span class="pd-mobile-nav-label">About</span>
+        <i class="fa-solid fa-chevron-right pd-mobile-nav-arrow"></i>
+      </a>
+      <a class="pd-mobile-nav-item pd-page-link" href="#" data-page="license">
+        <span class="pd-mobile-nav-icon"><i class="fa-solid fa-file-lines"></i></span>
+        <span class="pd-mobile-nav-label">License</span>
+        <i class="fa-solid fa-chevron-right pd-mobile-nav-arrow"></i>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Search bar (inline, slides down) -->
+  <div id="searchBar" class="pd-search-bar" aria-hidden="true">
+    <div class="pd-search-inner">
+      <i class="fa-solid fa-magnifying-glass pd-search-ico"></i>
+      <input type="text" class="pd-search-input" id="searchInput"
+             placeholder="Search events, labels, locations…" autocomplete="off"
+             aria-label="Search events" />
+      <button class="pd-action-btn pd-search-close" id="btnSearchClose" title="Close search">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="searchResults" class="pd-search-results" aria-live="polite"></div>
+  </div>
+
+</header>
+
+<!-- MAIN CONTENT -->
+<main class="pd-main">
+
+  <!-- CALENDAR VIEW -->
+  <div id="calendarView">
+    <!-- Month view -->
+    <div id="viewMonth" class="pd-view">
+      <div class="pd-month-grid-header" id="monthDayNames"></div>
+      <div class="pd-month-grid" id="monthGrid"></div>
+    </div>
+
+    <!-- Week view -->
+    <div id="viewWeek" class="pd-view d-none">
+      <div class="pd-week-scroll-outer">
+        <div class="pd-week-header" id="weekHeader"></div>
+        <div class="pd-allday-strip-wrap" id="weekAllDayStrip"></div>
+        <div class="pd-week-body-wrap">
+          <div class="pd-time-gutter" id="timeGutter"></div>
+          <div class="pd-week-body" id="weekBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Day view -->
+    <div id="viewDay" class="pd-view d-none">
+      <div class="pd-week-scroll-outer">
+        <div class="pd-day-header" id="dayHeader"></div>
+        <div class="pd-allday-strip-wrap" id="dayAllDayStrip"></div>
+        <div class="pd-week-body-wrap">
+          <div class="pd-time-gutter" id="dayTimeGutter"></div>
+          <div class="pd-day-body" id="dayBody"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Agenda view -->
+    <div id="viewAgenda" class="pd-view d-none">
+      <div class="pd-agenda-list" id="agendaList"></div>
+    </div>
+  </div>
+
+  <!-- PAGE VIEWS (settings/about/license) -->
+  <div id="pageView" class="pd-page-view d-none"></div>
+
+</main>
+
+<!-- FAB: Quick Add -->
+<button class="btn pd-fab" id="btnFab" title="Add event">
+  <i class="fa-solid fa-plus"></i>
+</button>
+
+<!-- ====== MODALS ====== -->
+
+<!-- Event Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content pd-modal-content">
+      <div class="modal-header pd-modal-header">
+        <h5 class="modal-title" id="eventModalLabel"><i class="fa-solid fa-calendar-plus me-2"></i>New Event</h5>
+        <button type="button" class="btn-close pd-btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="eventForm" novalidate>
+          <!-- Title -->
+          <div class="mb-3">
+            <input type="text" class="form-control pd-input pd-input-title" id="evTitle" placeholder="Event title" required />
+          </div>
+
+          <!-- Dates row -->
+          <div class="row g-2 mb-3">
+            <div class="col-12">
+              <div class="form-check form-switch mb-2">
+                <input class="form-check-input" type="checkbox" id="evAllDay" />
+                <label class="form-check-label" for="evAllDay">All day</label>
+              </div>
+            </div>
+            <div class="col-sm-6" id="startDateWrap">
+              <label class="form-label pd-label">Start</label>
+              <input type="datetime-local" class="form-control pd-input" id="evStart" required />
+            </div>
+            <div class="col-sm-6" id="endDateWrap">
+              <label class="form-label pd-label">End</label>
+              <input type="datetime-local" class="form-control pd-input" id="evEnd" required />
+            </div>
+            <div class="col-sm-6" id="startDateOnlyWrap" style="display:none">
+              <label class="form-label pd-label">Start date</label>
+              <input type="date" class="form-control pd-input" id="evStartDate" />
+            </div>
+            <div class="col-sm-6" id="endDateOnlyWrap" style="display:none">
+              <label class="form-label pd-label">End date</label>
+              <input type="date" class="form-control pd-input" id="evEndDate" />
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="mb-3">
+            <label class="form-label pd-label">Description (Markdown)</label>
+            <textarea class="form-control pd-input" id="evDescription" rows="3" placeholder="Add description…"></textarea>
+          </div>
+
+          <!-- Location / Timezone row -->
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label pd-label"><i class="fa-solid fa-location-dot me-1"></i>Location</label>
+              <input type="text" class="form-control pd-input" id="evLocation" placeholder="Location or URL" />
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label pd-label"><i class="fa-solid fa-clock me-1"></i>Timezone</label>
+              <select class="form-select pd-input" id="evTimezone"></select>
+            </div>
+          </div>
+
+          <!-- Color / Label row -->
+          <div class="row g-2 mb-3">
+            <div class="col-sm-6">
+              <label class="form-label pd-label">Color</label>
+              <div class="pd-color-picker" id="colorPicker"></div>
+            </div>
+            <div class="col-sm-6">
+              <label class="form-label pd-label">Label</label>
+              <input type="text" class="form-control pd-input" id="evLabel" placeholder="e.g. work, personal" />
+            </div>
+          </div>
+
+          <!-- Recurrence -->
+          <div class="mb-3">
+            <label class="form-label pd-label"><i class="fa-solid fa-repeat me-1"></i>Recurrence</label>
+            <select class="form-select pd-input" id="evRecurrence">
+              <option value="">Does not repeat</option>
+              <option value="FREQ=DAILY">Daily</option>
+              <option value="FREQ=WEEKLY">Weekly</option>
+              <option value="FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR">Every weekday (Mon–Fri)</option>
+              <option value="FREQ=MONTHLY">Monthly</option>
+              <option value="FREQ=YEARLY">Yearly</option>
+              <option value="custom">Custom…</option>
+            </select>
+            <input type="text" class="form-control pd-input mt-2 d-none" id="evRrule" placeholder="RRULE string e.g. FREQ=WEEKLY;BYDAY=MO,WE" />
+          </div>
+
+          <!-- Reminders -->
+          <div class="mb-3">
+            <label class="form-label pd-label"><i class="fa-solid fa-bell me-1"></i>Reminders</label>
+            <div id="reminderList" class="d-flex flex-wrap gap-2 mb-2"></div>
+            <div class="input-group input-group-sm" style="max-width:260px">
+              <input type="number" class="form-control pd-input" id="reminderMinutes" placeholder="Minutes before" min="1" />
+              <button type="button" class="btn pd-btn-ghost" id="btnAddReminder"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+          </div>
+
+          <!-- Attendees -->
+          <div class="mb-3">
+            <label class="form-label pd-label"><i class="fa-solid fa-users me-1"></i>Attendees</label>
+            <div id="attendeeList" class="d-flex flex-wrap gap-2 mb-2"></div>
+            <div class="input-group input-group-sm" style="max-width:320px">
+              <input type="email" class="form-control pd-input" id="attendeeInput" placeholder="email@example.com" />
+              <button type="button" class="btn pd-btn-ghost" id="btnAddAttendee"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+          </div>
+
+          <!-- Attachments -->
+          <div class="mb-2">
+            <label class="form-label pd-label"><i class="fa-solid fa-paperclip me-1"></i>Attachments (URLs)</label>
+            <div id="attachmentList" class="d-flex flex-wrap gap-2 mb-2"></div>
+            <div class="input-group input-group-sm" style="max-width:400px">
+              <input type="url" class="form-control pd-input" id="attachmentInput" placeholder="https://…" />
+              <button type="button" class="btn pd-btn-ghost" id="btnAddAttachment"><i class="fa-solid fa-plus"></i> Add</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer pd-modal-footer">
+        <div class="me-auto d-flex gap-2">
+          <button type="button" class="btn pd-btn-ghost d-none" id="btnExportEvent" title="Export as .md"><i class="fa-solid fa-file-export me-1"></i>Export .md</button>
+          <button type="button" class="btn pd-btn-danger d-none" id="btnDeleteEvent"><i class="fa-solid fa-trash me-1"></i>Delete</button>
+        </div>
+        <button type="button" class="btn pd-btn-ghost" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn pd-btn-primary" id="btnSaveEvent"><i class="fa-solid fa-floppy-disk me-1"></i>Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Detail Popover -->
+<div id="eventPopover" class="pd-event-popover d-none">
+  <div class="pd-popover-header">
+    <div class="pd-popover-color-dot" id="popColor"></div>
+    <span class="pd-popover-title" id="popTitle"></span>
+    <div class="ms-auto d-flex gap-1">
+      <button class="btn btn-sm pd-btn-icon" id="popEdit" title="Edit"><i class="fa-solid fa-pen"></i></button>
+      <button class="btn btn-sm pd-btn-icon" id="popDelete" title="Delete"><i class="fa-solid fa-trash"></i></button>
+      <button class="btn btn-sm pd-btn-icon" id="popClose"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+  <div class="pd-popover-body" id="popBody"></div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/recurrence.js"></script>
+<script src="js/ics.js"></script>
+<script src="js/events.js"></script>
+<script src="js/calendar.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
