@@ -1,0 +1,111 @@
+/* Recurrence rule expander — subset of iCalendar RRULE */
+const Recurrence = (() => {
+  const DAY_MAP = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+
+  function parseRRule(rrule) {
+    if (!rrule) return null;
+    const parts = {};
+    rrule.split(';').forEach(p => {
+      const [k, v] = p.split('=');
+      parts[k.trim()] = v ? v.trim() : '';
+    });
+    return parts;
+  }
+
+  function addDays(date, n) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + n);
+    return d;
+  }
+  function addWeeks(date, n) { return addDays(date, n * 7); }
+  function addMonths(date, n) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + n);
+    return d;
+  }
+  function addYears(date, n) {
+    const d = new Date(date);
+    d.setFullYear(d.getFullYear() + n);
+    return d;
+  }
+
+  function isoDate(d) { return d.toISOString().slice(0, 10); }
+
+  /**
+   * Expand an event with recurrence into occurrences within [rangeStart, rangeEnd].
+   * Returns array of { ...event, start, end } for each occurrence.
+   */
+  function expand(event, rangeStart, rangeEnd) {
+    if (!event.recurrence) return [event];
+
+    const rule = parseRRule(event.recurrence);
+    if (!rule || !rule.FREQ) return [event];
+
+    const freq = rule.FREQ;
+    const interval = parseInt(rule.INTERVAL || '1', 10);
+    const count = rule.COUNT ? parseInt(rule.COUNT, 10) : null;
+    const until = rule.UNTIL ? new Date(rule.UNTIL.replace(/(\d{4})(\d{2})(\d{2}).*/, '$1-$2-$3')) : null;
+    const byDay = rule.BYDAY ? rule.BYDAY.split(',').map(d => DAY_MAP[d.trim()]).filter(d => d !== undefined) : null;
+
+    const origStart = new Date(event.start);
+    const origEnd = new Date(event.end);
+    const duration = origEnd - origStart;
+
+    const results = [];
+    let current = new Date(origStart);
+    let occCount = 0;
+    const MAX_OCC = 500;
+
+    while (true) {
+      if (count !== null && occCount >= count) break;
+      if (until && current > until) break;
+      if (current > rangeEnd) break;
+      if (occCount > MAX_OCC) break;
+
+      if (current >= rangeStart && current <= rangeEnd) {
+        const occEnd = new Date(current.getTime() + duration);
+        results.push({
+          ...event,
+          id: event.id + '_' + isoDate(current),
+          _masterId: event.id,
+          _isOccurrence: true,
+          start: current.toISOString(),
+          end: occEnd.toISOString(),
+        });
+      }
+
+      occCount++;
+      if (freq === 'DAILY') {
+        current = addDays(current, interval);
+      } else if (freq === 'WEEKLY') {
+        if (byDay && byDay.length > 0) {
+          const sortedDays = [...byDay].sort((a, b) => a - b);
+          const curDow = current.getDay();
+          // Find the next matching day-of-week still within the current week
+          const nextInWeek = sortedDays.find(d => d > curDow);
+          if (nextInWeek !== undefined) {
+            current = addDays(current, nextInWeek - curDow);
+          } else {
+            // All BYDAY done for this week — jump to first BYDAY of next interval-th week
+            const startOfCurWeek = new Date(current);
+            startOfCurWeek.setDate(startOfCurWeek.getDate() - curDow);
+            const startOfNextWeek = addWeeks(startOfCurWeek, interval);
+            current = addDays(startOfNextWeek, sortedDays[0]);
+          }
+        } else {
+          current = addWeeks(current, interval);
+        }
+      } else if (freq === 'MONTHLY') {
+        current = addMonths(current, interval);
+      } else if (freq === 'YEARLY') {
+        current = addYears(current, interval);
+      } else {
+        break;
+      }
+    }
+
+    return results.length ? results : [];
+  }
+
+  return { expand, parseRRule };
+})();
