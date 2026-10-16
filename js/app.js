@@ -147,53 +147,53 @@
   function renderSettingsPage() {
     return `
     <div class="pd-page">
-      <h2><i class="fa-solid fa-gear me-2"></i>Settings</h2>
-      <p>Configure Payas Days preferences and manage your data.</p>
+      <h2><i class="fa-solid fa-gear me-2"></i>設定</h2>
+      <p>設定 Payas Days 的偏好並管理資料。</p>
       <hr/>
 
-      <h3>Appearance</h3>
+      <h3>外觀</h3>
       <div class="pd-setting-row">
-        <div><div class="pd-setting-label">Theme</div><div class="pd-setting-sub">Light or dark mode</div></div>
+        <div><div class="pd-setting-label">佈景主題</div><div class="pd-setting-sub">淺色或深色模式</div></div>
         <select class="form-select pd-input" id="settingTheme" style="width:140px">
-          <option value="light">Light</option>
-          <option value="dark">Dark</option>
+          <option value="light">淺色</option>
+          <option value="dark">深色</option>
         </select>
       </div>
 
-      <h3>Notifications</h3>
+      <h3>通知</h3>
       <div class="pd-setting-row">
-        <div><div class="pd-setting-label">Browser notifications</div><div class="pd-setting-sub">Requires browser permission</div></div>
-        <button class="btn pd-btn-ghost" id="btnRequestNotif"><i class="fa-solid fa-bell me-1"></i>Enable</button>
+        <div><div class="pd-setting-label">瀏覽器通知</div><div class="pd-setting-sub">需要授予瀏覽器通知權限</div></div>
+        <button class="btn pd-btn-ghost" id="btnRequestNotif"><i class="fa-solid fa-bell me-1"></i>啟用</button>
       </div>
 
-      <h3>Import &amp; Export</h3>
+      <h3>匯入與匯出</h3>
       <div class="row g-3 mb-3">
         <div class="col-sm-6">
-          <button class="btn pd-btn-ghost w-100" id="btnExportICS"><i class="fa-solid fa-file-export me-1"></i>Export ICS</button>
+          <button class="btn pd-btn-ghost w-100" id="btnExportICS"><i class="fa-solid fa-file-export me-1"></i>匯出 ICS</button>
         </div>
         <div class="col-sm-6">
-          <button class="btn pd-btn-ghost w-100" id="btnExportMD"><i class="fa-solid fa-file-export me-1"></i>Export Markdown bundle</button>
+          <button class="btn pd-btn-ghost w-100" id="btnExportMD"><i class="fa-solid fa-file-export me-1"></i>匯出 Markdown 檔案集</button>
         </div>
         <div class="col-sm-6">
           <label class="pd-import-area w-100" id="importICSLabel">
             <i class="fa-solid fa-file-import fa-lg d-block mb-2"></i>
-            <span>Import ICS / .ics file</span>
+            <span>匯入 ICS／.ics 檔案</span>
             <input type="file" id="importICSInput" accept=".ics,text/calendar" class="d-none" />
           </label>
         </div>
         <div class="col-sm-6">
           <label class="pd-import-area w-100" id="importMDLabel">
             <i class="fa-solid fa-file-import fa-lg d-block mb-2"></i>
-            <span>Import Markdown events (.md files)</span>
+            <span>匯入 Markdown 事件（.md 檔案）</span>
             <input type="file" id="importMDInput" accept=".md,text/markdown" multiple class="d-none" />
           </label>
         </div>
       </div>
 
-      <h3>Danger Zone</h3>
+      <h3>危險操作</h3>
       <div class="pd-setting-row">
-        <div><div class="pd-setting-label" style="color:#dc2626">Delete all events</div><div class="pd-setting-sub">Cannot be undone</div></div>
-        <button class="btn pd-btn-danger" id="btnClearAll">Clear all</button>
+        <div><div class="pd-setting-label" style="color:#dc2626">刪除所有事件</div><div class="pd-setting-sub">此操作無法復原</div></div>
+        <button class="btn pd-btn-danger" id="btnClearAll">全部清除</button>
       </div>
     </div>`;
   }
@@ -214,10 +214,10 @@
       if (notifBtn && 'Notification' in window) {
         const updateNotifBtn = perm => {
           if (perm === 'granted') {
-            notifBtn.innerHTML = '<i class="fa-solid fa-bell me-1"></i>Enabled';
+            notifBtn.innerHTML = '<i class="fa-solid fa-bell me-1"></i>已啟用';
             notifBtn.disabled = true;
           } else if (perm === 'denied') {
-            notifBtn.innerHTML = '<i class="fa-solid fa-bell-slash me-1"></i>Blocked in browser';
+            notifBtn.innerHTML = '<i class="fa-solid fa-bell-slash me-1"></i>已在瀏覽器中封鎖';
             notifBtn.disabled = true;
           }
         };
@@ -237,7 +237,7 @@
       // Export MD
       document.getElementById('btnExportMD')?.addEventListener('click', async () => {
         const files = await Storage.exportAllMarkdown();
-        if (files.length === 0) { alert('No events to export.'); return; }
+        if (files.length === 0) { alert('目前沒有可匯出的事件。'); return; }
         // Bundle as one text file with separators
         const bundle = files.map(f => `# FILE: ${f.name}\n\n${f.content}`).join('\n\n---\n\n');
         downloadText(bundle, 'payas-days-events.md', 'text/markdown');
@@ -250,7 +250,7 @@
         const imported = ICS.importICS(text);
         for (const ev of imported) await Events.save(ev);
         await Events.load();
-        alert(`Imported ${imported.length} event(s) successfully.`);
+        alert(`成功匯入 ${imported.length} 個事件。`);
         showPage('settings');
       });
       // Import MD
@@ -259,7 +259,7 @@
         const fileObjs = await Promise.all(files.map(async f => ({ name: f.name, content: await f.text() })));
         const imported = await Storage.importMarkdownFiles(fileObjs);
         await Events.load();
-        alert(`Imported ${imported.length} event(s) successfully.`);
+        alert(`成功匯入 ${imported.length} 個事件。`);
         showPage('settings');
       });
       // Drag-drop import
@@ -280,10 +280,10 @@
       });
       // Clear all
       document.getElementById('btnClearAll')?.addEventListener('click', async () => {
-        if (!confirm('Delete ALL events? This cannot be undone.')) return;
+        if (!confirm('確定要刪除所有事件嗎？此操作無法復原。')) return;
         await Storage.clearAllEvents();
         await Events.load();
-        alert('All events deleted.');
+        alert('所有事件已刪除。');
       });
     }
   }
@@ -293,33 +293,33 @@
     return `
     <div class="pd-page">
       <h2 style="font-family:'Fraunces',serif;color:var(--accent)"><i class="fa-regular fa-calendar-days me-2"></i>Payas Days</h2>
-      <p style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">v1.0.0 · Calendar</p>
-      <p>Payas Days is a responsive, privacy-first web calendar that runs entirely in your browser with no server required. Events are stored locally using IndexedDB and can be exported as Markdown files or standard ICS format.</p>
+      <p style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">v1.0.0 · 日曆</p>
+      <p>Payas Days 是一款響應式、重視隱私的網頁日曆，完全在瀏覽器中執行，不需要伺服器。事件會使用 IndexedDB 儲存在本機，並可匯出為 Markdown 或標準 ICS 格式。</p>
       <hr/>
-      <h3>Features</h3>
+      <h3>功能</h3>
       <ul>
-        <li>Month, Week, Day, and Agenda views</li>
-        <li>Recurring events with iCalendar RRULE support</li>
-        <li>Dark &amp; Light themes with system preference detection</li>
-        <li>ICS import &amp; export (Google Calendar, Outlook compatible)</li>
-        <li>Markdown file export for portable storage</li>
-        <li>Browser push notifications for event reminders</li>
-        <li>Fully offline — no account required</li>
+        <li>月、週、日與議程檢視</li>
+        <li>支援 iCalendar RRULE 的重複事件</li>
+        <li>深色與淺色主題，並可偵測系統偏好</li>
+        <li>ICS 匯入與匯出（相容 Google 日曆、Outlook）</li>
+        <li>匯出 Markdown 檔案，方便攜帶與保存</li>
+        <li>透過瀏覽器通知接收事件提醒</li>
+        <li>無須帳號；事件資料儲存於本機</li>
       </ul>
       <hr/>
-      <h3>Developer</h3>
+      <h3>開發者</h3>
       <p>
         <strong>Saman Wijesinghe</strong><br/>
-        <span style="color:var(--pd-text-muted)">Full-Stack Developer &amp; Open Source Enthusiast</span>
+        <span style="color:var(--pd-text-muted)">全端開發者暨開源軟體愛好者</span>
       </p>
       <hr/>
-      <h3>Technology</h3>
+      <h3>技術</h3>
       <ul>
-        <li>Vanilla JavaScript (ES2022)</li>
+        <li>原生 JavaScript（ES2022）</li>
         <li>Bootstrap 5.3 · Font Awesome 6.5</li>
-        <li>IndexedDB for local storage</li>
-        <li>Markdown + YAML front matter for event serialization</li>
-        <li>iCalendar (RFC 5545) for ICS import/export</li>
+        <li>使用 IndexedDB 儲存本機資料</li>
+        <li>使用 Markdown 與 YAML front matter 序列化事件</li>
+        <li>使用 iCalendar（RFC 5545）匯入／匯出 ICS</li>
       </ul>
     </div>`;
   }
@@ -328,8 +328,8 @@
   function renderLicensePage() {
     return `
     <div class="pd-page">
-      <h2><i class="fa-solid fa-file-lines me-2"></i>License</h2>
-      <p style="color:var(--pd-text-muted);font-size:12px;">MIT License</p>
+      <h2><i class="fa-solid fa-file-lines me-2"></i>授權條款</h2>
+      <p style="color:var(--pd-text-muted);font-size:12px;">MIT License（英文原文）</p>
       <hr/>
       <pre style="white-space:pre-wrap;font-size:13px;color:var(--pd-text-secondary);line-height:1.7">MIT License
 
@@ -364,13 +364,17 @@ SOFTWARE.</pre>
   function initColorPicker() {
     const picker = document.getElementById('colorPicker');
     if (!picker) return;
+    const colorLabels = {
+      blue: '藍色', teal: '藍綠色', green: '綠色', yellow: '黃色', orange: '橘色',
+      red: '紅色', pink: '粉紅色', purple: '紫色', gray: '灰色', indigo: '靛藍色',
+    };
     picker.innerHTML = '';
     for (const [name, hex] of Object.entries(Events.EVENT_COLORS)) {
       const sw = document.createElement('div');
       sw.className = 'pd-color-swatch' + (name === 'blue' ? ' active' : '');
       sw.style.background = hex;
       sw.dataset.color = name;
-      sw.title = name;
+      sw.title = colorLabels[name] || name;
       sw.addEventListener('click', () => {
         picker.querySelectorAll('.pd-color-swatch').forEach(s => s.classList.remove('active'));
         sw.classList.add('active');
@@ -405,7 +409,7 @@ SOFTWARE.</pre>
 
   function openNewEventModal(date) {
     editingEventId = null;
-    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-calendar-plus me-2"></i>New Event';
+    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-calendar-plus me-2"></i>新增事件';
     document.getElementById('btnDeleteEvent').classList.add('d-none');
     document.getElementById('btnExportEvent').classList.add('d-none');
     resetForm();
@@ -424,7 +428,7 @@ SOFTWARE.</pre>
     const ev = Events.getById(id);
     if (!ev) return;
     editingEventId = id;
-    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-pen me-2"></i>Edit Event';
+    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-pen me-2"></i>編輯事件';
     document.getElementById('btnDeleteEvent').classList.remove('d-none');
     document.getElementById('btnExportEvent').classList.remove('d-none');
 
@@ -462,7 +466,7 @@ SOFTWARE.</pre>
       rruleInput.classList.add('d-none');
     }
 
-    renderTagList('reminderList', ev.reminders || [], 'min before');
+    renderTagList('reminderList', ev.reminders || [], '分鐘前');
     renderTagList('attendeeList', ev.attendees || [], '');
     renderTagList('attachmentList', ev.attachments || [], '');
 
@@ -478,7 +482,7 @@ SOFTWARE.</pre>
     document.getElementById('btnAddReminder').addEventListener('click', () => {
       const mins = parseInt(document.getElementById('reminderMinutes').value, 10);
       if (!mins || mins < 1) return;
-      addTagToList('reminderList', String(mins), 'min before');
+      addTagToList('reminderList', String(mins), '分鐘前');
       document.getElementById('reminderMinutes').value = '';
     });
     document.getElementById('btnAddAttendee').addEventListener('click', () => {
@@ -498,7 +502,7 @@ SOFTWARE.</pre>
 
     document.getElementById('btnDeleteEvent').addEventListener('click', async () => {
       if (!editingEventId) return;
-      if (!confirm('Delete this event?')) return;
+      if (!confirm('確定要刪除此事件嗎？')) return;
       await Events.remove(editingEventId);
       bootstrap.Modal.getInstance(document.getElementById('eventModal'))?.hide();
       Calendar.render();
@@ -541,16 +545,16 @@ SOFTWARE.</pre>
     if (allDay) {
       const startDateVal = document.getElementById('evStartDate').value;
       const endDateVal = document.getElementById('evEndDate').value;
-      if (!startDateVal || !endDateVal) { alert('Please set start and end dates.'); return; }
-      if (endDateVal < startDateVal) { alert('End date must be on or after start date.'); return; }
+      if (!startDateVal || !endDateVal) { alert('請設定開始與結束日期。'); return; }
+      if (endDateVal < startDateVal) { alert('結束日期不可早於開始日期。'); return; }
       start = startDateVal + 'T00:00:00';
       end = endDateVal + 'T23:59:59';
     } else {
       start = document.getElementById('evStart').value;
       end = document.getElementById('evEnd').value;
     }
-    if (!start || !end) { alert('Please set start and end date/time.'); return; }
-    if (new Date(end) <= new Date(start)) { alert('End date/time must be after start date/time.'); return; }
+    if (!start || !end) { alert('請設定開始與結束日期／時間。'); return; }
+    if (new Date(end) <= new Date(start)) { alert('結束時間必須晚於開始時間。'); return; }
 
     const rruleSel = document.getElementById('evRecurrence').value;
     const rruleCustom = document.getElementById('evRrule').value.trim();
@@ -576,8 +580,8 @@ SOFTWARE.</pre>
     // Conflict detection
     const conflicts = Events.detectConflicts(ev);
     if (conflicts.length > 0) {
-      const names = conflicts.map(c => c.title || 'Untitled').join(', ');
-      if (!confirm(`This event conflicts with: ${names}. Save anyway?`)) return;
+      const names = conflicts.map(c => c.title || '未命名事件').join('、');
+      if (!confirm(`此事件與下列事件時間重疊：${names}。仍要儲存嗎？`)) return;
     }
 
     await Events.save(ev);
@@ -591,7 +595,7 @@ SOFTWARE.</pre>
     if (!container) return;
     const chip = document.createElement('span');
     chip.className = 'pd-tag-chip';
-    chip.innerHTML = `${value}${suffix ? ' <em>' + suffix + '</em>' : ''} <span class="remove-tag" title="Remove">&times;</span>`;
+    chip.innerHTML = `${value}${suffix ? ' <em>' + suffix + '</em>' : ''} <span class="remove-tag" title="移除">&times;</span>`;
     chip.dataset.value = value;
     chip.querySelector('.remove-tag').addEventListener('click', () => chip.remove());
     container.appendChild(chip);
@@ -618,7 +622,7 @@ SOFTWARE.</pre>
     });
     document.getElementById('popDelete').addEventListener('click', async () => {
       const id = document.getElementById('eventPopover').dataset.eventId;
-      if (!confirm('Delete this event?')) return;
+      if (!confirm('確定要刪除此事件嗎？')) return;
       await Events.remove(id);
       closePopover();
       Calendar.render();
@@ -636,14 +640,14 @@ SOFTWARE.</pre>
     const pop = document.getElementById('eventPopover');
     pop.dataset.eventId = id;
     document.getElementById('popColor').style.background = Events.colorHex(ev.color);
-    document.getElementById('popTitle').textContent = ev.title || 'Untitled';
+    document.getElementById('popTitle').textContent = ev.title || '未命名事件';
 
     let body = '';
     const s = new Date(ev.start);
     if (ev.allDay) {
-      body += `<div class="pd-popover-row"><i class="fa-regular fa-calendar"></i><span>${s.toLocaleDateString()}</span></div>`;
+      body += `<div class="pd-popover-row"><i class="fa-regular fa-calendar"></i><span>${s.toLocaleDateString('zh-TW')}</span></div>`;
     } else {
-      body += `<div class="pd-popover-row"><i class="fa-regular fa-clock"></i><span>${s.toLocaleDateString()} ${Calendar.fmtTime(ev.start)} – ${Calendar.fmtTime(ev.end)}</span></div>`;
+      body += `<div class="pd-popover-row"><i class="fa-regular fa-clock"></i><span>${s.toLocaleDateString('zh-TW')} ${Calendar.fmtTime(ev.start)} – ${Calendar.fmtTime(ev.end)}</span></div>`;
     }
     if (ev.location) body += `<div class="pd-popover-row"><i class="fa-solid fa-location-dot"></i><span>${escapeHTML(ev.location)}</span></div>`;
     if (ev.recurrence) body += `<div class="pd-popover-row"><i class="fa-solid fa-repeat"></i><span>${escapeHTML(ev.recurrence)}</span></div>`;
@@ -722,7 +726,7 @@ SOFTWARE.</pre>
         const found = Events.search(q);
         results.innerHTML = '';
         if (!found.length) {
-          results.innerHTML = '<div class="pd-search-result-item" style="color:var(--pd-text-muted)">No results found.</div>';
+          results.innerHTML = '<div class="pd-search-result-item" style="color:var(--pd-text-muted)">找不到符合的事件。</div>';
         } else {
           found.slice(0, 20).forEach(ev => {
             const item = document.createElement('div');
@@ -730,8 +734,8 @@ SOFTWARE.</pre>
             item.innerHTML = `
               <div style="display:flex;align-items:center;gap:8px">
                 <span style="width:10px;height:10px;border-radius:50%;background:${escapeHTML(Events.colorHex(ev.color))};flex-shrink:0;display:inline-block"></span>
-                <span style="font-weight:500">${escapeHTML(ev.title || 'Untitled')}</span>
-                <span style="font-size:11px;color:var(--pd-text-muted);margin-left:auto">${new Date(ev.start).toLocaleDateString()}</span>
+                <span style="font-weight:500">${escapeHTML(ev.title || '未命名事件')}</span>
+                <span style="font-size:11px;color:var(--pd-text-muted);margin-left:auto">${new Date(ev.start).toLocaleDateString('zh-TW')}</span>
               </div>
               ${ev.location ? `<div style="font-size:12px;color:var(--pd-text-muted);margin-left:18px"><i class="fa-solid fa-location-dot me-1"></i>${escapeHTML(ev.location)}</div>` : ''}`;
             item.addEventListener('click', () => {
@@ -779,8 +783,8 @@ SOFTWARE.</pre>
     const tomorrow14 = new Date(now); tomorrow14.setDate(tomorrow14.getDate()+1); tomorrow14.setHours(14,0,0,0);
     const tomorrow15 = new Date(now); tomorrow15.setDate(tomorrow15.getDate()+1); tomorrow15.setHours(15,30,0,0);
 
-    await Events.save({ title: 'Welcome to Payas Days!', description: 'Your privacy-first calendar. Create, edit, and manage events. Use the + button to add a new event.', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: 'welcome', recurrence: '', reminders: [], attendees: [], attachments: [] });
-    await Events.save({ title: 'Team Meeting', description: 'Weekly sync', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: 'work', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: 'Conference Room A' });
+    await Events.save({ title: '歡迎使用 Payas Days！', description: '這是重視隱私的個人日曆。你可以在此建立、編輯與管理事件，使用右下角的「＋」按鈕新增事件。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '歡迎', recurrence: '', reminders: [], attendees: [], attachments: [] });
+    await Events.save({ title: '團隊會議', description: '每週同步會議', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '會議室 A' });
 
     await Storage.setSetting('seeded', true);
     await Events.load();

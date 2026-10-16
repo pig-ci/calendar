@@ -4,8 +4,8 @@ function escHtml(s) {
 }
 
 const Calendar = (() => {
-  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
+  const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
 
   let currentDate = new Date();
   let currentView = 'month';
@@ -29,22 +29,23 @@ const Calendar = (() => {
   }
 
   function titleLabel() {
-    if (currentView === 'month') return `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    if (currentView === 'month') return `${currentDate.getFullYear()}年${MONTHS[currentDate.getMonth()]}`;
     if (currentView === 'week') {
       const ws = weekStart(currentDate);
       const we = new Date(ws); we.setDate(we.getDate() + 6);
-      if (ws.getMonth() === we.getMonth()) return `${MONTHS[ws.getMonth()]} ${ws.getFullYear()}`;
-      return `${MONTHS[ws.getMonth()].slice(0,3)} – ${MONTHS[we.getMonth()].slice(0,3)} ${we.getFullYear()}`;
+      if (ws.getMonth() === we.getMonth()) return `${ws.getFullYear()}年${MONTHS[ws.getMonth()]}`;
+      return `${ws.getFullYear()}年${MONTHS[ws.getMonth()]} – ${we.getFullYear()}年${MONTHS[we.getMonth()]}`;
     }
-    if (currentView === 'day') return `${DAYS[currentDate.getDay()]}, ${MONTHS[currentDate.getMonth()]} ${currentDate.getDate()}, ${currentDate.getFullYear()}`;
+    if (currentView === 'day') return `${currentDate.getFullYear()}年${currentDate.getMonth() + 1}月${currentDate.getDate()}日（星期${DAYS[currentDate.getDay()]}）`;
     if (currentView === 'agenda') {
       const rangeEnd = new Date(currentDate); rangeEnd.setDate(rangeEnd.getDate() + 29);
       if (rangeEnd.getMonth() === currentDate.getMonth() && rangeEnd.getFullYear() === currentDate.getFullYear()) {
-        return `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+        return `${currentDate.getFullYear()}年${MONTHS[currentDate.getMonth()]}`;
       }
       const endYear = rangeEnd.getFullYear();
-      const yearSuffix = endYear !== currentDate.getFullYear() ? ` ${endYear}` : '';
-      return `${MONTHS[currentDate.getMonth()].slice(0, 3)} – ${MONTHS[rangeEnd.getMonth()].slice(0, 3)}${yearSuffix} ${currentDate.getFullYear()}`;
+      const startLabel = `${currentDate.getFullYear()}年${MONTHS[currentDate.getMonth()]}`;
+      const endLabel = `${endYear === currentDate.getFullYear() ? '' : `${endYear}年`}${MONTHS[rangeEnd.getMonth()]}`;
+      return `${startLabel} – ${endLabel}`;
     }
     return '';
   }
@@ -69,9 +70,9 @@ const Calendar = (() => {
   function fmtTime(iso) {
     const d = new Date(iso);
     let h = d.getHours(), m = d.getMinutes();
-    const ap = h >= 12 ? 'pm' : 'am';
+    const ap = h >= 12 ? '下午' : '上午';
     h = h % 12 || 12;
-    return `${h}${m ? ':'+String(m).padStart(2,'0') : ''}${ap}`;
+    return `${ap}${h}:${String(m).padStart(2,'0')}`;
   }
 
   /* ---- Month view ---- */
@@ -124,7 +125,7 @@ const Calendar = (() => {
         const chip = document.createElement('div');
         chip.className = 'pd-event-chip';
         chip.style.background = Events.colorHex(ev.color);
-        chip.textContent = (ev.allDay ? '' : fmtTime(ev.start) + ' ') + (ev.title || 'Untitled');
+        chip.textContent = (ev.allDay ? '' : fmtTime(ev.start) + ' ') + (ev.title || '未命名事件');
         chip.title = ev.title;
         chip.dataset.id = ev._masterId || ev.id;
         chip.addEventListener('click', e => { e.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
@@ -133,7 +134,7 @@ const Calendar = (() => {
       if (dayEvs.length > MAX_SHOW) {
         const more = document.createElement('div');
         more.className = 'pd-more-chip';
-        more.textContent = `+${dayEvs.length - MAX_SHOW} more`;
+        more.textContent = `+${dayEvs.length - MAX_SHOW} 個更多`;
         more.addEventListener('click', e => {
           e.stopPropagation();
           setView('day');
@@ -176,7 +177,7 @@ const Calendar = (() => {
     for (let h = 0; h < 24; h++) {
       const label = document.createElement('div');
       label.className = 'pd-time-slot-label';
-      label.textContent = h === 0 ? '' : (h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h-12}pm`);
+      label.textContent = h === 0 ? '' : `${String(h).padStart(2, '0')}:00`;
       gutter.appendChild(label);
     }
 
@@ -217,7 +218,7 @@ const Calendar = (() => {
 
     const gutter = document.createElement('div');
     gutter.className = 'pd-allday-gutter';
-    gutter.textContent = 'all-day';
+    gutter.textContent = '全天';
     strip.appendChild(gutter);
 
     for (let i = 0; i < 7; i++) {
@@ -234,7 +235,7 @@ const Calendar = (() => {
         chip.style.background = Events.colorHex(ev.color);
         chip.style.fontSize = '10px';
         chip.style.marginBottom = '1px';
-        chip.textContent = ev.title || 'Untitled';
+        chip.textContent = ev.title || '未命名事件';
         chip.title = ev.title || '';
         chip.dataset.id = ev._masterId || ev.id;
         chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
@@ -254,7 +255,7 @@ const Calendar = (() => {
     const gutter = document.createElement('div');
     gutter.className = 'pd-allday-gutter';
     gutter.style.width = '52px';
-    gutter.textContent = 'all-day';
+    gutter.textContent = '全天';
     strip.appendChild(gutter);
 
     const col = document.createElement('div');
@@ -264,7 +265,7 @@ const Calendar = (() => {
       chip.className = 'pd-event-chip';
       chip.style.background = Events.colorHex(ev.color);
       chip.style.marginBottom = '2px';
-      chip.textContent = ev.title || 'Untitled';
+      chip.textContent = ev.title || '未命名事件';
       chip.title = ev.title || '';
       chip.dataset.id = ev._masterId || ev.id;
       chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
@@ -284,7 +285,7 @@ const Calendar = (() => {
       el.style.top = (startMin) + 'px';
       el.style.height = durMin + 'px';
       el.style.background = Events.colorHex(ev.color);
-      el.textContent = ev.title || 'Untitled';
+      el.textContent = ev.title || '未命名事件';
       el.title = ev.title;
       el.dataset.id = ev._masterId || ev.id;
       el.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, el); });
@@ -300,13 +301,13 @@ const Calendar = (() => {
     if (!headerEl || !body || !gutter) return;
 
     const d = new Date(currentDate);
-    headerEl.innerHTML = `<h2>${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()} ${d.getFullYear()}</h2>`;
+    headerEl.innerHTML = `<h2>${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日（星期${DAYS[d.getDay()]}）</h2>`;
 
     gutter.innerHTML = '';
     for (let h = 0; h < 24; h++) {
       const label = document.createElement('div');
       label.className = 'pd-time-slot-label';
-      label.textContent = h === 0 ? '' : (h < 12 ? `${h}am` : h === 12 ? '12pm' : `${h-12}pm`);
+      label.textContent = h === 0 ? '' : `${String(h).padStart(2, '0')}:00`;
       gutter.appendChild(label);
     }
 
@@ -345,7 +346,7 @@ const Calendar = (() => {
     list.innerHTML = '';
 
     if (evs.length === 0) {
-      list.innerHTML = '<div class="pd-agenda-empty"><i class="fa-regular fa-calendar-xmark fa-2x mb-3 d-block"></i>No events in the next 30 days.</div>';
+      list.innerHTML = '<div class="pd-agenda-empty"><i class="fa-regular fa-calendar-xmark fa-2x mb-3 d-block"></i>未來 30 天沒有事件。</div>';
       return;
     }
 
@@ -365,7 +366,7 @@ const Calendar = (() => {
       const hdr = document.createElement('div');
       hdr.className = 'pd-agenda-day-header' + (isToday(d) ? ' today' : '');
       hdr.innerHTML = `<div class="day-num">${d.getDate()}</div>
-        <div class="day-info"><span class="fw-bold">${DAYS[d.getDay()]}</span> · ${MONTHS[d.getMonth()]} ${d.getFullYear()}${isToday(d) ? ' · <span style="color:var(--pd-accent)">Today</span>' : ''}</div>`;
+        <div class="day-info"><span class="fw-bold">星期${DAYS[d.getDay()]}</span> · ${d.getFullYear()}年${d.getMonth() + 1}月${isToday(d) ? ' · <span style="color:var(--pd-accent)">今天</span>' : ''}</div>`;
       dayEl.appendChild(hdr);
 
       for (const ev of dayEvs) {
@@ -376,11 +377,11 @@ const Calendar = (() => {
         colorBar.style.background = Events.colorHex(ev.color);
         const timeEl = document.createElement('div');
         timeEl.className = 'pd-agenda-time';
-        timeEl.textContent = ev.allDay ? 'All day' : `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+        timeEl.textContent = ev.allDay ? '全天' : `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
         const info = document.createElement('div');
         const titleDiv = document.createElement('div');
         titleDiv.className = 'pd-agenda-title';
-        titleDiv.textContent = ev.title || 'Untitled';
+        titleDiv.textContent = ev.title || '未命名事件';
         info.appendChild(titleDiv);
         if (ev.location) {
           const locDiv = document.createElement('div');

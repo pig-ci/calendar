@@ -1,20 +1,20 @@
 ---
 id: evt-001
-title: Team Stand-up
+title: 團隊每日例會
 description: |
-  Daily sync meeting. Agenda:
-  - Yesterday's progress
-  - Today's plan
-  - Blockers
+  每日同步會議，議程：
+  - 昨日進度
+  - 今日計畫
+  - 待排除事項
 start: 2026-04-18T09:00:00
 end: 2026-04-18T09:30:00
 allDay: false
 timezone: Asia/Colombo
-location: Google Meet
+location: Google Meet 線上會議
 attendees:
   - saman@example.com
 color: blue
-label: work
+label: 工作
 recurrence: FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR
 reminders:
   - 10
@@ -23,4 +23,4 @@ created: 2026-04-01T00:00:00
 modified: 2026-04-01T00:00:00
 ---
 
-Daily stand-up notes go here.
+在此記錄每日例會內容。

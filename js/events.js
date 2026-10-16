@@ -104,7 +104,7 @@ const Events = (() => {
       scheduledTimers[key] = setTimeout(() => {
         if (Notification.permission === 'granted') {
           new Notification('Payas Days', {
-            body: `${ev.title} starts in ${mins} minute${mins > 1 ? 's' : ''}`,
+            body: `${ev.title} 將於 ${mins} 分鐘後開始`,
             icon: '/favicon.ico'
           });
         }
