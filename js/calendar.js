@@ -65,6 +65,17 @@ const Calendar = (() => {
   function endOfDay(d) {
     const r = new Date(d); r.setHours(23,59,59,999); return r;
   }
+  function eventDaySpan(ev, rangeStart) {
+    const start = startOfDay(new Date(ev.start));
+    const endDate = new Date(ev.end);
+    const end = startOfDay(endDate);
+    if (end > start && end.getTime() === endDate.getTime()) end.setDate(end.getDate() - 1);
+    const dateIndex = date => Math.round((
+      Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) -
+      Date.UTC(rangeStart.getFullYear(), rangeStart.getMonth(), rangeStart.getDate())
+    ) / 86400000);
+    return { startDay: dateIndex(start), endDay: Math.max(dateIndex(start), dateIndex(end)) };
+  }
   function sameDay(a, b) {
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
   }
@@ -100,56 +111,64 @@ const Calendar = (() => {
     const eventsInRange = Events.getInRange(startOfDay(startCell), endOfDay(endCell));
 
     grid.innerHTML = '';
-    const cursor = new Date(startCell);
-    while (cursor <= endCell) {
-      const cellDate = new Date(cursor);
-      const cell = document.createElement('div');
-      cell.className = 'pd-month-cell' +
-        (cursor.getMonth() !== month ? ' other-month' : '') +
-        (isToday(cursor) ? ' today' : '');
+    const weekStartDate = new Date(startCell);
+    while (weekStartDate <= endCell) {
+      const week = document.createElement('div');
+      week.className = 'pd-month-week';
 
-      const dateStr = cursor.toISOString().slice(0, 10);
-      cell.dataset.date = dateStr;
+      const weekDates = [];
+      for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+        const date = new Date(weekStartDate);
+        date.setDate(date.getDate() + dayIndex);
+        weekDates.push(date);
 
-      const numEl = document.createElement('div');
-      numEl.className = 'pd-day-num';
-      numEl.textContent = cursor.getDate();
-      cell.appendChild(numEl);
+        const cell = document.createElement('div');
+        cell.className = 'pd-month-cell' +
+          (date.getMonth() !== month ? ' other-month' : '') +
+          (isToday(date) ? ' today' : '');
+        cell.style.gridColumn = String(dayIndex + 1);
+        cell.style.gridRow = '1 / -1';
+        cell.dataset.date = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-      // Events for this day
-      const dayEvs = eventsInRange.filter(ev => {
-        const s = new Date(ev.start); const e = new Date(ev.end);
-        const cd = new Date(cursor);
-        return sameDay(s, cd) || (ev.allDay && s <= cd && e >= cd);
-      }).sort((a, b) => new Date(a.start) - new Date(b.start));
-
-      const MAX_SHOW = 3;
-      dayEvs.slice(0, MAX_SHOW).forEach(ev => {
-        const chip = document.createElement('div');
-        chip.className = 'pd-event-chip';
-        chip.style.background = Events.colorHex(ev.color);
-        chip.textContent = (ev.allDay ? '' : fmtTime(ev.start) + ' ') + (ev.title || '未命名事件');
-        chip.title = ev.title;
-        chip.dataset.id = ev._masterId || ev.id;
-        chip.addEventListener('click', e => { e.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
-        cell.appendChild(chip);
-      });
-      if (dayEvs.length > MAX_SHOW) {
-        const more = document.createElement('div');
-        more.className = 'pd-more-chip';
-        more.textContent = `+${dayEvs.length - MAX_SHOW} 個更多`;
-        more.addEventListener('click', e => {
-          e.stopPropagation();
-          setView('day');
-          setDate(new Date(cellDate));
-          onDayClick(new Date(cellDate));
-        });
-        cell.appendChild(more);
+        const numEl = document.createElement('div');
+        numEl.className = 'pd-day-num';
+        numEl.textContent = date.getDate();
+        cell.appendChild(numEl);
+        cell.addEventListener('click', () => onDayClick(new Date(date)));
+        week.appendChild(cell);
       }
 
-      cell.addEventListener('click', () => onDayClick(new Date(cellDate)));
-      grid.appendChild(cell);
-      cursor.setDate(cursor.getDate() + 1);
+      const weekEvents = eventsInRange.map(event => ({
+        event,
+        ...eventDaySpan(event, weekStartDate)
+      })).filter(item => item.startDay <= 6 && item.endDay >= 0)
+        .sort((a, b) => a.startDay - b.startDay || b.endDay - a.endDay || new Date(a.event.start) - new Date(b.event.start));
+      const laneEnds = [];
+      weekEvents.forEach(({ event, startDay, endDay }) => {
+        const firstDay = Math.max(0, startDay);
+        const lastDay = Math.min(6, endDay);
+        let lane = laneEnds.findIndex(lastOccupiedDay => lastOccupiedDay < firstDay);
+        if (lane === -1) lane = laneEnds.length;
+        laneEnds[lane] = lastDay;
+
+        const bar = document.createElement('div');
+        bar.className = 'pd-event-chip pd-month-event';
+        bar.style.background = Events.colorHex(event.color);
+        bar.style.gridColumn = `${firstDay + 1} / ${lastDay + 2}`;
+        bar.style.gridRow = String(lane + 2);
+        bar.textContent = `${event.allDay ? '' : `${fmtTime(event.start)} `}${event.title || '未命名事件'}`;
+        bar.title = event.title || '';
+        bar.dataset.id = event._masterId || event.id;
+        bar.addEventListener('click', e => {
+          e.stopPropagation();
+          onEventClick(event._masterId || event.id, bar);
+        });
+        week.appendChild(bar);
+      });
+
+      week.style.gridTemplateRows = `30px repeat(${laneEnds.length}, 18px) minmax(0, 1fr)`;
+      grid.appendChild(week);
+      weekStartDate.setDate(weekStartDate.getDate() + 7);
     }
   }
 
@@ -234,6 +253,7 @@ const Calendar = (() => {
 
     // Day columns
     body.innerHTML = '';
+    const timedEvents = eventsInRange.filter(ev => !ev.allDay);
     for (let i = 0; i < 7; i++) {
       const d = new Date(ws); d.setDate(d.getDate() + i);
       const col = document.createElement('div');
@@ -253,18 +273,64 @@ const Calendar = (() => {
         col.appendChild(nowLine);
       }
       // Events
-      const dayEvs = eventsInRange.filter(ev => !ev.allDay && sameDay(new Date(ev.start), d));
+      const dayEvs = timedEvents.filter(ev => {
+        const span = eventDaySpan(ev, ws);
+        return span.startDay === span.endDay && sameDay(new Date(ev.start), d);
+      });
       placeWeekEvents(dayEvs, col);
       body.appendChild(col);
     }
+    placeWeekMultiDayEvents(timedEvents.filter(ev => {
+      const span = eventDaySpan(ev, ws);
+      return span.startDay < span.endDay;
+    }), body, ws);
     renderWeekAllDay(ws, eventsInRange);
+  }
+
+  function placeWeekMultiDayEvents(events, body, ws) {
+    events.forEach(ev => {
+      const start = new Date(ev.start);
+      const end = new Date(ev.end);
+      const { startDay, endDay } = eventDaySpan(ev, ws);
+      const firstDay = Math.max(0, startDay);
+      const lastDay = Math.min(6, endDay);
+      const endIsMidnight = end.getHours() === 0 && end.getMinutes() === 0 &&
+        end.getSeconds() === 0 && end.getMilliseconds() === 0;
+      const endFraction = endIsMidnight
+        ? 1
+        : (end.getHours() * 60 + end.getMinutes() + end.getSeconds() / 60) / 1440;
+      const endPosition = Math.min(7, lastDay + endFraction);
+      const bar = document.createElement('div');
+      bar.className = 'pd-week-event pd-week-multiday-event';
+      bar.style.top = `${startDay < 0 ? 0 : start.getHours() * 60 + start.getMinutes()}px`;
+      bar.style.left = `${firstDay / 7 * 100}%`;
+      bar.style.right = `${(7 - endPosition) / 7 * 100}%`;
+      bar.style.background = Events.colorHex(ev.color);
+      bar.textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)} · ${ev.title || '未命名事件'}`;
+      bar.title = ev.title || '';
+      bar.dataset.id = ev._masterId || ev.id;
+      bar.addEventListener('click', e => {
+        e.stopPropagation();
+        onEventClick(ev._masterId || ev.id, bar);
+      });
+      body.appendChild(bar);
+    });
   }
 
   function renderWeekAllDay(ws, eventsInRange) {
     const strip = document.getElementById('weekAllDayStrip');
     if (!strip) return;
     strip.innerHTML = '';
-    const allDayEvs = eventsInRange.filter(ev => ev.allDay);
+    const allDayEvs = eventsInRange.filter(ev => ev.allDay).map(ev => {
+      const { startDay: firstDay, endDay: lastDay } = eventDaySpan(ev, ws);
+      return {
+        event: ev,
+        startDay: Math.max(0, firstDay),
+        endDay: Math.min(6, Math.max(firstDay, lastDay)),
+        overlapsWeek: firstDay <= 6 && lastDay >= 0
+      };
+    }).filter(item => item.overlapsWeek)
+      .sort((a, b) => a.startDay - b.startDay || b.endDay - a.endDay);
     if (allDayEvs.length === 0) return;
 
     const gutter = document.createElement('div');
@@ -272,28 +338,26 @@ const Calendar = (() => {
     gutter.textContent = '全天';
     strip.appendChild(gutter);
 
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(ws); d.setDate(d.getDate() + i);
-      const col = document.createElement('div');
-      col.className = 'pd-allday-col';
-      const dayEvs = allDayEvs.filter(ev => {
-        const s = new Date(ev.start); const e = new Date(ev.end);
-        return sameDay(s, d) || (s <= d && e >= d);
-      });
-      dayEvs.forEach(ev => {
-        const chip = document.createElement('div');
-        chip.className = 'pd-event-chip';
-        chip.style.background = Events.colorHex(ev.color);
-        chip.style.fontSize = '10px';
-        chip.style.marginBottom = '1px';
-        chip.textContent = ev.title || '未命名事件';
-        chip.title = ev.title || '';
-        chip.dataset.id = ev._masterId || ev.id;
-        chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
-        col.appendChild(chip);
-      });
-      strip.appendChild(col);
-    }
+    const grid = document.createElement('div');
+    grid.className = 'pd-allday-grid';
+    const laneEnds = [];
+    allDayEvs.forEach(({ event, startDay, endDay }) => {
+      let lane = laneEnds.findIndex(lastDay => lastDay < startDay);
+      if (lane === -1) lane = laneEnds.length;
+      laneEnds[lane] = endDay;
+
+      const chip = document.createElement('div');
+      chip.className = 'pd-event-chip';
+      chip.style.background = Events.colorHex(event.color);
+      chip.style.gridColumn = `${startDay + 1} / ${endDay + 2}`;
+      chip.style.gridRow = String(lane + 1);
+      chip.textContent = event.title || '未命名事件';
+      chip.title = event.title || '';
+      chip.dataset.id = event._masterId || event.id;
+      chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(event._masterId || event.id, chip); });
+      grid.appendChild(chip);
+    });
+    strip.appendChild(grid);
   }
 
   function renderDayAllDay(d, eventsInRange) {
@@ -325,12 +389,21 @@ const Calendar = (() => {
     strip.appendChild(col);
   }
 
-  function placeWeekEvents(evs, col, showDetails = false) {
+  function placeWeekEvents(evs, col, showDetails = false, visibleDay = null) {
     evs.forEach(ev => {
       const s = new Date(ev.start);
       const e = new Date(ev.end);
-      const startMin = s.getHours() * 60 + s.getMinutes();
-      const durMin = Math.max(15, (e - s) / 60000);
+      let visibleStart = s;
+      let visibleEnd = e;
+      if (visibleDay) {
+        const dayStart = startOfDay(visibleDay);
+        const dayEnd = endOfDay(visibleDay);
+        if (e <= dayStart || s > dayEnd) return;
+        visibleStart = s < dayStart ? dayStart : s;
+        visibleEnd = e > dayEnd ? dayEnd : e;
+      }
+      const startMin = visibleStart.getHours() * 60 + visibleStart.getMinutes();
+      const durMin = Math.max(15, (visibleEnd - visibleStart) / 60000);
       const el = document.createElement('div');
       el.className = 'pd-week-event' + (showDetails ? ' pd-day-event' : '');
       el.style.top = (startMin) + 'px';
@@ -347,7 +420,7 @@ const Calendar = (() => {
 
         const time = document.createElement('div');
         time.className = 'pd-day-event-time';
-        time.textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+        time.textContent = `${fmtTime(visibleStart)} – ${fmtTime(visibleEnd)}`;
         el.appendChild(time);
 
         [ev.location, ev.label, ev.description].forEach((detail, index) => {
@@ -399,7 +472,7 @@ const Calendar = (() => {
       col.appendChild(nowLine);
     }
     const allEvs = Events.getInRange(startOfDay(d), endOfDay(d));
-    placeWeekEvents(allEvs.filter(ev => !ev.allDay), col, true);
+    placeWeekEvents(allEvs.filter(ev => !ev.allDay), col, true, d);
     body.appendChild(col);
     renderDayAllDay(d, allEvs);
   }
