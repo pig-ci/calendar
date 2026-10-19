@@ -12,6 +12,46 @@ const Recurrence = (() => {
     return parts;
   }
 
+  function describe(rrule) {
+    const rule = parseRRule(rrule);
+    if (!rule || !rule.FREQ) return '自訂重複';
+
+    const frequencies = {
+      SECONDLY: ['每秒', '秒'],
+      MINUTELY: ['每分鐘', '分鐘'],
+      HOURLY: ['每小時', '小時'],
+      DAILY: ['每天', '天'],
+      WEEKLY: ['每週', '週'],
+      MONTHLY: ['每月', '個月'],
+      YEARLY: ['每年', '年'],
+    };
+    const frequency = frequencies[rule.FREQ];
+    if (!frequency) return '自訂重複';
+
+    const parsedInterval = parseInt(rule.INTERVAL || '1', 10);
+    const interval = Number.isInteger(parsedInterval) && parsedInterval > 0 ? parsedInterval : 1;
+    let description = interval === 1
+      ? frequency[0]
+      : `每隔 ${interval} ${frequency[1]}`;
+    const details = [];
+
+    if (rule.BYDAY) {
+      const dayNames = { SU: '週日', MO: '週一', TU: '週二', WE: '週三', TH: '週四', FR: '週五', SA: '週六' };
+      const days = rule.BYDAY.split(',')
+        .map(day => dayNames[day.trim().slice(-2)])
+        .filter(Boolean);
+      if (days.length) description += `（${days.join('、')}）`;
+    }
+    if (rule.BYMONTHDAY) details.push(`每月 ${rule.BYMONTHDAY.split(',').join('、')} 日`);
+    if (rule.COUNT) details.push(`共 ${rule.COUNT} 次`);
+    if (rule.UNTIL) {
+      const date = rule.UNTIL.match(/^(\d{4})(\d{2})(\d{2})/);
+      if (date) details.push(`至 ${date[1]} 年 ${Number(date[2])} 月 ${Number(date[3])} 日`);
+    }
+
+    return [description, ...details].join('，');
+  }
+
   function addDays(date, n) {
     const d = new Date(date);
     d.setDate(d.getDate() + n);
@@ -107,5 +147,5 @@ const Recurrence = (() => {
     return results.length ? results : [];
   }
 
-  return { expand, parseRRule };
+  return { expand, parseRRule, describe };
 })();

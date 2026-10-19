@@ -100,6 +100,7 @@ const Calendar = (() => {
     grid.innerHTML = '';
     const cursor = new Date(startCell);
     while (cursor <= endCell) {
+      const cellDate = new Date(cursor);
       const cell = document.createElement('div');
       cell.className = 'pd-month-cell' +
         (cursor.getMonth() !== month ? ' other-month' : '') +
@@ -138,13 +139,13 @@ const Calendar = (() => {
         more.addEventListener('click', e => {
           e.stopPropagation();
           setView('day');
-          setDate(new Date(cursor));
-          onDayClick(new Date(cursor));
+          setDate(new Date(cellDate));
+          onDayClick(new Date(cellDate));
         });
         cell.appendChild(more);
       }
 
-      cell.addEventListener('click', () => onDayClick(new Date(cursor)));
+      cell.addEventListener('click', () => onDayClick(new Date(cellDate)));
       grid.appendChild(cell);
       cursor.setDate(cursor.getDate() + 1);
     }

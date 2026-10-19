@@ -420,6 +420,9 @@ SOFTWARE.</pre>
     const end = new Date(start); end.setHours(end.getHours() + 1);
     document.getElementById('evStart').value = toLocalISO(start);
     document.getElementById('evEnd').value = toLocalISO(end);
+    document.getElementById('evStartDate').value = toLocalISO(start).slice(0, 10);
+    document.getElementById('evEndDate').value = toLocalISO(end).slice(0, 10);
+    updateEventEndMin();
 
     new bootstrap.Modal(document.getElementById('eventModal')).show();
   }
@@ -448,6 +451,7 @@ SOFTWARE.</pre>
       document.getElementById('evStart').value = toLocalISO(new Date(ev.start));
       document.getElementById('evEnd').value = toLocalISO(new Date(ev.end));
     }
+    updateEventEndMin();
 
     const tz = document.getElementById('evTimezone');
     if (tz && ev.timezone) tz.value = ev.timezone;
@@ -475,6 +479,7 @@ SOFTWARE.</pre>
 
   function initEventForm() {
     document.getElementById('evAllDay').addEventListener('change', e => toggleAllDay(e.target.checked));
+    document.getElementById('evStart').addEventListener('input', updateEventEndMin);
     document.getElementById('evRecurrence').addEventListener('change', e => {
       document.getElementById('evRrule').classList.toggle('d-none', e.target.value !== 'custom');
     });
@@ -524,6 +529,12 @@ SOFTWARE.</pre>
     document.getElementById('endDateOnlyWrap').style.display = isAllDay ? '' : 'none';
   }
 
+  function updateEventEndMin() {
+    const start = document.getElementById('evStart').value;
+    const endInput = document.getElementById('evEnd');
+    endInput.min = start ? toLocalISO(new Date(new Date(start).getTime() + 15 * 60000)) : '';
+  }
+
   function resetForm() {
     document.getElementById('eventForm').reset();
     document.getElementById('evRrule').classList.add('d-none');
@@ -554,7 +565,13 @@ SOFTWARE.</pre>
       end = document.getElementById('evEnd').value;
     }
     if (!start || !end) { alert('請設定開始與結束日期／時間。'); return; }
-    if (new Date(end) <= new Date(start)) { alert('結束時間必須晚於開始時間。'); return; }
+    const startTime = new Date(start).getTime();
+    const endTime = new Date(end).getTime();
+    if (endTime < startTime) { alert('結束時間不可早於開始時間。'); return; }
+    if (!allDay && endTime - startTime < 15 * 60000) {
+      alert('事件長度不得少於 15 分鐘。');
+      return;
+    }
 
     const rruleSel = document.getElementById('evRecurrence').value;
     const rruleCustom = document.getElementById('evRrule').value.trim();
@@ -650,7 +667,7 @@ SOFTWARE.</pre>
       body += `<div class="pd-popover-row"><i class="fa-regular fa-clock"></i><span>${s.toLocaleDateString('zh-TW')} ${Calendar.fmtTime(ev.start)} – ${Calendar.fmtTime(ev.end)}</span></div>`;
     }
     if (ev.location) body += `<div class="pd-popover-row"><i class="fa-solid fa-location-dot"></i><span>${escapeHTML(ev.location)}</span></div>`;
-    if (ev.recurrence) body += `<div class="pd-popover-row"><i class="fa-solid fa-repeat"></i><span>${escapeHTML(ev.recurrence)}</span></div>`;
+    if (ev.recurrence) body += `<div class="pd-popover-row"><i class="fa-solid fa-repeat"></i><span>${escapeHTML(Recurrence.describe(ev.recurrence))}</span></div>`;
     if (ev.description) body += `<div class="pd-popover-row"><i class="fa-regular fa-file-lines"></i><span style="white-space:pre-wrap">${escapeHTML(ev.description.slice(0, 120))}</span></div>`;
     if (ev.label) body += `<div class="pd-popover-row"><i class="fa-solid fa-tag"></i><span>${escapeHTML(ev.label)}</span></div>`;
     document.getElementById('popBody').innerHTML = body;
@@ -783,8 +800,8 @@ SOFTWARE.</pre>
     const tomorrow14 = new Date(now); tomorrow14.setDate(tomorrow14.getDate()+1); tomorrow14.setHours(14,0,0,0);
     const tomorrow15 = new Date(now); tomorrow15.setDate(tomorrow15.getDate()+1); tomorrow15.setHours(15,30,0,0);
 
-    await Events.save({ title: '歡迎使用 Payas Days！', description: '這是重視隱私的個人日曆。你可以在此建立、編輯與管理事件，使用右下角的「＋」按鈕新增事件。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '歡迎', recurrence: '', reminders: [], attendees: [], attachments: [] });
-    await Events.save({ title: '團隊會議', description: '每週同步會議', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '會議室 A' });
+    await Events.save({ title: '日曆使用指南', description: '歡迎使用 Payas Days！這是一款重視隱私的個人日曆。你可以使用右下角的「＋」按鈕新增事件，並透過月、週、日或議程檢視管理行程。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '使用指南', recurrence: '', reminders: [], attendees: [], attachments: [] });
+    await Events.save({ title: '團隊週會', description: '每週團隊同步會議，討論本週進度、目前阻礙與後續工作安排。', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '第一會議室' });
 
     await Storage.setSetting('seeded', true);
     await Events.load();
