@@ -1,8 +1,3 @@
-/* Calendar view renderers */
-function escHtml(s) {
-  return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 const Calendar = (() => {
   const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
   const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
