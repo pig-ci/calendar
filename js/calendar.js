@@ -6,11 +6,13 @@ const Calendar = (() => {
   let currentView = 'month';
   let onEventClick = () => {};
   let onDayClick = () => {};
+  let use24HourTime = false;
 
   function setDate(d) { currentDate = new Date(d); }
   function getDate() { return new Date(currentDate); }
   function setView(v) { currentView = v; }
   function getView() { return currentView; }
+  function set24HourTime(enabled) { use24HourTime = enabled; }
   function on(eventType, fn) {
     if (eventType === 'eventClick') onEventClick = fn;
     if (eventType === 'dayClick') onDayClick = fn;
@@ -81,7 +83,8 @@ const Calendar = (() => {
   function fmtTime(iso) {
     const d = new Date(iso);
     let h = d.getHours(), m = d.getMinutes();
-    const ap = h >= 12 ? '下午' : '上午';
+    if (use24HourTime) return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    const ap = h === 0 ? '凌晨' : h === 12 ? '中午' : h > 12 ? '下午' : '上午';
     h = h % 12 || 12;
     return `${ap}${h}:${String(m).padStart(2,'0')}`;
   }
@@ -572,6 +575,6 @@ const Calendar = (() => {
 
   return {
     setDate, getDate, setView, getView, navigate, titleLabel, render, on,
-    MONTHS, DAYS, fmtTime, sameDay, isToday, startOfDay, endOfDay
+    MONTHS, DAYS, fmtTime, sameDay, isToday, startOfDay, endOfDay, set24HourTime
   };
 })();

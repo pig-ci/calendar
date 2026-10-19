@@ -1,6 +1,7 @@
 /* Payas Days — 主應用程式 */
 (async () => {
   await Storage.open();
+  let alwaysUse24HourTime = await Storage.getSetting('alwaysUse24HourTime', false);
   const seeded = await Storage.getSetting('seeded', false);
   if (seeded) {
     const sampleDescriptions = new Map([
@@ -17,6 +18,7 @@
   }
   await Events.load();
   await Events.scheduleAllReminders();
+  Calendar.set24HourTime(alwaysUse24HourTime);
   await loadTheme();
   initColorPicker();
   initTimezones();
@@ -175,6 +177,12 @@
           <option value="dark">深色</option>
         </select>
       </div>
+      <div class="pd-setting-row">
+        <div><div class="pd-setting-label">永遠使用24小時制</div><div class="pd-setting-sub">以 00:00–23:59 顯示事件時間</div></div>
+        <div class="form-check form-switch mb-0">
+          <input class="form-check-input" type="checkbox" id="setting24HourTime" role="switch" aria-label="永遠使用24小時制" ${alwaysUse24HourTime ? 'checked' : ''} />
+        </div>
+      </div>
 
       <h3>通知</h3>
       <div class="pd-setting-row">
@@ -223,6 +231,15 @@
         themeEl.addEventListener('change', async () => {
           applyTheme(themeEl.value);
           await Storage.setSetting('theme', themeEl.value);
+        });
+      }
+      const timeFormatEl = document.getElementById('setting24HourTime');
+      if (timeFormatEl) {
+        timeFormatEl.addEventListener('change', async () => {
+          await Storage.setSetting('alwaysUse24HourTime', timeFormatEl.checked);
+          alwaysUse24HourTime = timeFormatEl.checked;
+          Calendar.set24HourTime(alwaysUse24HourTime);
+          Calendar.render();
         });
       }
       // 通知
