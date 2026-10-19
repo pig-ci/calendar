@@ -1,4 +1,4 @@
-/* Event management — CRUD, reminders, conflict detection */
+/* 事件管理 — 新增、讀取、更新、刪除、提醒與衝突偵測 */
 const Events = (() => {
   let cache = [];
 
@@ -47,7 +47,7 @@ const Events = (() => {
   }
 
   /**
-   * Returns all events (including recurrence expansions) that overlap [start, end].
+   * 回傳與 [start, end] 範圍重疊的所有事件（包含展開後的重複事件）。
    */
   function getInRange(rangeStart, rangeEnd) {
     const results = [];
@@ -75,7 +75,7 @@ const Events = (() => {
     );
   }
 
-  /* ---- Conflict detection ---- */
+  /* ---- 衝突偵測 ---- */
   function detectConflicts(newEv) {
     if (newEv.allDay || !hasValidRange(newEv)) return [];
     const ns = new Date(newEv.start);
@@ -96,7 +96,7 @@ const Events = (() => {
     });
   }
 
-  /* ---- Browser notification reminders ---- */
+  /* ---- 瀏覽器通知提醒 ---- */
   const scheduledTimers = {};
 
   function scheduleReminders(ev) {
@@ -123,7 +123,7 @@ const Events = (() => {
 
   async function scheduleAllReminders() {
     if (!('Notification' in window)) return;
-    // Only schedule if already granted — never auto-prompt on load
+    // 僅在已授予通知權限時排程，載入時絕不自動要求權限
     if (Notification.permission !== 'granted') return;
     for (const ev of cache) scheduleReminders(ev);
   }

@@ -1,4 +1,4 @@
-/* ICS / iCalendar import and export */
+/* ICS／iCalendar 匯入與匯出 */
 const ICS = (() => {
   function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -78,8 +78,8 @@ const ICS = (() => {
   }
 
   function parseICSDate(val) {
-    // DATE-TIME: 20260418T090000 or 20260418T090000Z
-    // DATE: 20260418
+    // 日期時間格式：20260418T090000 或 20260418T090000Z
+    // 日期格式：20260418
     const clean = val.replace(/Z$/, '');
     if (clean.includes('T')) {
       const m = clean.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/);
@@ -96,7 +96,7 @@ const ICS = (() => {
   }
 
   function importICS(text) {
-    // Unfold lines (continuation lines start with space or tab)
+    // 展開摺疊的行（續行以空格或定位字元開頭）
     const unfolded = text.replace(/\r\n[ \t]/g, '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     const lines = unfolded.split('\n');
 
@@ -110,7 +110,7 @@ const ICS = (() => {
       const prop = rawLine.slice(0, colonIdx).toUpperCase();
       const val = rawLine.slice(colonIdx + 1).trim();
 
-      // Handle params (e.g. DTSTART;VALUE=DATE:...)
+      // 處理參數（例如 DTSTART;VALUE=DATE:...）
       const propBase = prop.split(';')[0];
       const propRaw = rawLine.slice(0, colonIdx);
 

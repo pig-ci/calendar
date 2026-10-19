@@ -11,20 +11,20 @@
 </head>
 <body>
 
-<!-- ====== TOP NAVIGATION ====== -->
+<!-- ====== 頂端導覽列 ====== -->
 <header class="pd-header sticky-top">
 
-  <!-- Primary bar: brand | date nav | actions -->
+  <!-- 主列：品牌｜日期導覽｜操作按鈕 -->
   <div class="pd-topbar">
 
-    <!-- Brand -->
+    <!-- 品牌 -->
     <a class="pd-brand" href="#" id="brandHomeLink" title="返回日曆">
       <i class="fa-regular fa-calendar-days"></i>
       <span class="pd-brand-text">Payas Days</span>
       <em class="pd-brand-sub">日曆</em>
     </a>
 
-    <!-- Center: date navigation -->
+    <!-- 中央：日期導覽 -->
     <div class="pd-date-nav">
       <button class="pd-arrow-btn" id="btnPrev" title="上一段（←）" aria-label="上一段">
         <i class="fa-solid fa-chevron-left"></i>
@@ -37,19 +37,19 @@
       </button>
     </div>
 
-    <!-- Right actions -->
+    <!-- 右側操作 -->
     <div class="pd-topbar-actions">
-      <!-- Search toggle -->
+      <!-- 切換搜尋 -->
       <button class="pd-action-btn" id="btnSearch" title="搜尋事件（/）" aria-label="搜尋事件">
         <i class="fa-solid fa-magnifying-glass"></i>
       </button>
 
-      <!-- Theme toggle -->
+      <!-- 切換主題 -->
       <button class="pd-action-btn pd-theme-btn" id="btnTheme" title="切換深色／淺色模式" aria-label="切換佈景主題">
         <span class="pd-theme-icon"><i class="fa-solid fa-moon"></i></span>
       </button>
 
-      <!-- Desktop: page links -->
+      <!-- 桌面版：頁面連結 -->
       <div class="pd-page-links d-none d-lg-flex" role="navigation" aria-label="應用程式頁面">
         <div class="pd-vdivider"></div>
         <a class="pd-action-btn pd-page-link" href="#" data-page="settings" title="設定">
@@ -66,7 +66,7 @@
         </a>
       </div>
 
-      <!-- Mobile: hamburger -->
+      <!-- 行動版：漢堡選單 -->
       <button class="pd-action-btn pd-menu-btn d-lg-none" id="btnMobileMenu" title="選單" aria-label="開啟選單"
               aria-expanded="false" aria-controls="pdMobileMenu">
         <i class="fa-solid fa-bars" id="mobileMenuIcon"></i>
@@ -74,7 +74,7 @@
     </div>
   </div>
 
-  <!-- Secondary bar: view tabs -->
+  <!-- 次列：檢視分頁 -->
   <div class="pd-tabsbar" role="tablist" aria-label="日曆檢視模式">
     <div class="pd-tabs">
       <button class="pd-view-btn" data-view="year" role="tab" aria-selected="false">
@@ -103,7 +103,7 @@
     </div>
   </div>
 
-  <!-- Mobile slide-down menu -->
+  <!-- 行動版下拉選單 -->
   <div class="pd-mobile-menu" id="pdMobileMenu" aria-hidden="true">
     <nav class="pd-mobile-nav">
       <a class="pd-mobile-nav-item pd-page-link" href="#" data-page="settings">
@@ -124,7 +124,7 @@
     </nav>
   </div>
 
-  <!-- Search bar (inline, slides down) -->
+  <!-- 搜尋列（內嵌並向下滑入） -->
   <div id="searchBar" class="pd-search-bar" aria-hidden="true">
     <div class="pd-search-inner">
       <i class="fa-solid fa-magnifying-glass pd-search-ico"></i>
@@ -140,23 +140,23 @@
 
 </header>
 
-<!-- MAIN CONTENT -->
+<!-- 主要內容 -->
 <main class="pd-main">
 
-  <!-- CALENDAR VIEW -->
+  <!-- 日曆檢視 -->
   <div id="calendarView">
-    <!-- Year view -->
+    <!-- 年檢視 -->
     <div id="viewYear" class="pd-view d-none">
       <div class="pd-year-grid" id="yearGrid"></div>
     </div>
 
-    <!-- Month view -->
+    <!-- 月檢視 -->
     <div id="viewMonth" class="pd-view">
       <div class="pd-month-grid-header" id="monthDayNames"></div>
       <div class="pd-month-grid" id="monthGrid"></div>
     </div>
 
-    <!-- Week view -->
+    <!-- 週檢視 -->
     <div id="viewWeek" class="pd-view d-none">
       <div class="pd-week-scroll-outer">
         <div class="pd-week-header" id="weekHeader"></div>
@@ -168,7 +168,7 @@
       </div>
     </div>
 
-    <!-- Day view -->
+    <!-- 日檢視 -->
     <div id="viewDay" class="pd-view d-none">
       <div class="pd-week-scroll-outer">
         <div class="pd-day-header" id="dayHeader"></div>
@@ -180,25 +180,25 @@
       </div>
     </div>
 
-    <!-- Agenda view -->
+    <!-- 議程檢視 -->
     <div id="viewAgenda" class="pd-view d-none">
       <div class="pd-agenda-list" id="agendaList"></div>
     </div>
   </div>
 
-  <!-- PAGE VIEWS (settings/about/license) -->
+  <!-- 頁面檢視（設定／關於／授權） -->
   <div id="pageView" class="pd-page-view d-none"></div>
 
 </main>
 
-<!-- FAB: Quick Add -->
+<!-- 快速新增按鈕 -->
 <button class="btn pd-fab" id="btnFab" title="新增事件" aria-label="新增事件">
   <i class="fa-solid fa-plus"></i>
 </button>
 
-<!-- ====== MODALS ====== -->
+<!-- ====== 對話框 ====== -->
 
-<!-- Event Modal -->
+<!-- 事件對話框 -->
 <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
     <div class="modal-content pd-modal-content">
@@ -208,7 +208,7 @@
       </div>
       <div class="modal-body">
         <form id="eventForm" novalidate>
-          <!-- Title -->
+          <!-- 標題 -->
           <div class="mb-3">
             <input type="text" class="form-control pd-input pd-input-title" id="evTitle" placeholder="事件標題" required />
           </div>
@@ -222,7 +222,7 @@
             </select>
           </div>
 
-          <!-- Dates row -->
+          <!-- 日期列 -->
           <div class="row g-2 mb-3">
             <div class="col-12">
               <div class="form-check form-switch mb-2">
@@ -248,13 +248,13 @@
             </div>
           </div>
 
-          <!-- Description -->
+          <!-- 描述 -->
           <div class="mb-3">
             <label class="form-label pd-label">描述（Markdown）</label>
             <textarea class="form-control pd-input" id="evDescription" rows="3" placeholder="輸入描述…"></textarea>
           </div>
 
-          <!-- Location / Timezone row -->
+          <!-- 地點／時區列 -->
           <div class="row g-2 mb-3">
             <div class="col-sm-6">
               <label class="form-label pd-label"><i class="fa-solid fa-location-dot me-1"></i>地點</label>
@@ -266,7 +266,7 @@
             </div>
           </div>
 
-          <!-- Color / Label row -->
+          <!-- 顏色／標籤列 -->
           <div class="row g-2 mb-3">
             <div class="col-sm-6">
               <label class="form-label pd-label">顏色</label>
@@ -278,7 +278,7 @@
             </div>
           </div>
 
-          <!-- Recurrence -->
+          <!-- 重複規則 -->
           <div class="mb-3">
             <label class="form-label pd-label"><i class="fa-solid fa-repeat me-1"></i>重複</label>
             <select class="form-select pd-input" id="evRecurrence">
@@ -293,7 +293,7 @@
             <input type="text" class="form-control pd-input mt-2 d-none" id="evRrule" placeholder="RRULE 規則，例如 FREQ=WEEKLY;BYDAY=MO,WE" />
           </div>
 
-          <!-- Reminders -->
+          <!-- 提醒 -->
           <div class="mb-3">
             <label class="form-label pd-label"><i class="fa-solid fa-bell me-1"></i>提醒</label>
             <div id="reminderList" class="d-flex flex-wrap gap-2 mb-2"></div>
@@ -303,7 +303,7 @@
             </div>
           </div>
 
-          <!-- Attendees -->
+          <!-- 參與者 -->
           <div class="mb-3">
             <label class="form-label pd-label"><i class="fa-solid fa-users me-1"></i>參與者</label>
             <div id="attendeeList" class="d-flex flex-wrap gap-2 mb-2"></div>
@@ -313,7 +313,7 @@
             </div>
           </div>
 
-          <!-- Attachments -->
+          <!-- 附件 -->
           <div class="mb-2">
             <label class="form-label pd-label"><i class="fa-solid fa-paperclip me-1"></i>附件（網址）</label>
             <div id="attachmentList" class="d-flex flex-wrap gap-2 mb-2"></div>
@@ -336,7 +336,7 @@
   </div>
 </div>
 
-<!-- Event Detail Popover -->
+<!-- 事件詳細資料快顯視窗 -->
 <div id="eventPopover" class="pd-event-popover d-none">
   <div class="pd-popover-header">
     <div class="pd-popover-color-dot" id="popColor"></div>
@@ -350,7 +350,7 @@
   <div class="pd-popover-body" id="popBody"></div>
 </div>
 
-<!-- Delete confirmation -->
+<!-- 刪除確認 -->
 <dialog class="pd-delete-dialog" id="deleteConfirm" aria-labelledby="deleteConfirmTitle" aria-describedby="deleteConfirmMessage">
   <div class="pd-delete-confirm-content">
     <h2 id="deleteConfirmTitle"><i class="fa-solid fa-triangle-exclamation me-2"></i>刪除事件</h2>
@@ -362,7 +362,7 @@
   </div>
 </dialog>
 
-<!-- Scripts -->
+<!-- 指令碼 -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/storage.js"></script>
 <script src="js/recurrence.js"></script>

@@ -1,4 +1,4 @@
-/* Storage adapter — IndexedDB-backed, Markdown export/import */
+/* 儲存介接層 — 使用 IndexedDB，支援 Markdown 匯入／匯出 */
 const Storage = (() => {
   const DB_NAME = 'payas-days';
   const DB_VERSION = 1;
@@ -76,10 +76,10 @@ const Storage = (() => {
     return promisify(tx(STORE_SETTINGS, 'readwrite').put({ key, value }));
   }
 
-  /* ---- Markdown serialization ---- */
+  /* ---- Markdown 序列化 ---- */
   function yamlStr(v) {
     const s = String(v);
-    // Quote values that are empty, boolean-like, or start with YAML special chars
+    // 空值、類布林值或以 YAML 特殊字元開頭的值需加上引號
     if (s === '' || s === 'true' || s === 'false' || s === 'null' ||
         s.startsWith('#') || s.startsWith('"') || s.startsWith("'") ||
         s !== s.trim()) {

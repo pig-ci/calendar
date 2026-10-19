@@ -1,4 +1,4 @@
-/* Recurrence rule expander — subset of iCalendar RRULE */
+/* 重複規則展開器 — 支援部分 iCalendar RRULE 規則 */
 const Recurrence = (() => {
   const DAY_MAP = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
 
@@ -72,8 +72,8 @@ const Recurrence = (() => {
   function isoDate(d) { return d.toISOString().slice(0, 10); }
 
   /**
-   * Expand an event with recurrence into occurrences within [rangeStart, rangeEnd].
-   * Returns array of { ...event, start, end } for each occurrence.
+   * 將重複事件展開為 [rangeStart, rangeEnd] 範圍內的各次事件。
+   * 每次事件皆以 { ...event, start, end } 的陣列元素形式回傳。
    */
   function expand(event, rangeStart, rangeEnd) {
     if (!event.recurrence) return [event];
@@ -121,12 +121,12 @@ const Recurrence = (() => {
         if (byDay && byDay.length > 0) {
           const sortedDays = [...byDay].sort((a, b) => a - b);
           const curDow = current.getDay();
-          // Find the next matching day-of-week still within the current week
+          // 找出本週內下一個符合條件的星期幾
           const nextInWeek = sortedDays.find(d => d > curDow);
           if (nextInWeek !== undefined) {
             current = addDays(current, nextInWeek - curDow);
           } else {
-            // All BYDAY done for this week — jump to first BYDAY of next interval-th week
+            // 本週的 BYDAY 日期已處理完畢，跳至下一個間隔週的第一個 BYDAY 日期
             const startOfCurWeek = new Date(current);
             startOfCurWeek.setDate(startOfCurWeek.getDate() - curDow);
             const startOfNextWeek = addWeeks(startOfCurWeek, interval);

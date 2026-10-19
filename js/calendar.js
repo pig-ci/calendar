@@ -47,7 +47,7 @@ const Calendar = (() => {
     return '';
   }
 
-  /* ---- Helpers ---- */
+  /* ---- 輔助函式 ---- */
   function weekStart(d) {
     const s = new Date(d);
     s.setDate(s.getDate() - s.getDay());
@@ -86,7 +86,7 @@ const Calendar = (() => {
     return `${ap}${h}:${String(m).padStart(2,'0')}`;
   }
 
-  /* ---- Month view ---- */
+  /* ---- 月檢視 ---- */
   function renderMonth() {
     const grid = document.getElementById('monthGrid');
     const header = document.getElementById('monthDayNames');
@@ -99,7 +99,7 @@ const Calendar = (() => {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
 
-    // Range: prev month fill + current month + next month fill
+    // 範圍：填入上個月、本月及下個月的日期
     const startCell = new Date(firstDay);
     startCell.setDate(startCell.getDate() - firstDay.getDay());
     const endCell = new Date(lastDay);
@@ -170,7 +170,7 @@ const Calendar = (() => {
     }
   }
 
-  /* ---- Year view ---- */
+  /* ---- 年檢視 ---- */
   function renderYear() {
     const grid = document.getElementById('yearGrid');
     if (!grid) return;
@@ -218,7 +218,7 @@ const Calendar = (() => {
     }
   }
 
-  /* ---- Week view ---- */
+  /* ---- 週檢視 ---- */
   function renderWeek() {
     const headerEl = document.getElementById('weekHeader');
     const body = document.getElementById('weekBody');
@@ -229,7 +229,7 @@ const Calendar = (() => {
     const rangeEnd = new Date(ws); rangeEnd.setDate(rangeEnd.getDate() + 6); rangeEnd.setHours(23,59,59,999);
     const eventsInRange = Events.getInRange(ws, rangeEnd).filter(Events.isImportant);
 
-    // Header
+    // 標題列
     headerEl.innerHTML = '<div style="width:56px;flex-shrink:0;border-right:1px solid var(--pd-border)"></div>';
     for (let i = 0; i < 7; i++) {
       const d = new Date(ws); d.setDate(d.getDate() + i);
@@ -240,7 +240,7 @@ const Calendar = (() => {
       headerEl.appendChild(cell);
     }
 
-    // Time gutter
+    // 時間欄
     gutter.innerHTML = '';
     for (let h = 0; h < 24; h++) {
       const label = document.createElement('div');
@@ -249,7 +249,7 @@ const Calendar = (() => {
       gutter.appendChild(label);
     }
 
-    // Day columns
+    // 每日欄位
     body.innerHTML = '';
     const timedEvents = eventsInRange.filter(ev => !ev.allDay);
     for (let i = 0; i < 7; i++) {
@@ -261,7 +261,7 @@ const Calendar = (() => {
         line.className = 'pd-time-line';
         col.appendChild(line);
       }
-      // Now line
+      // 現在時間線
       if (isToday(d)) {
         const now = new Date();
         const pct = (now.getHours() * 60 + now.getMinutes()) / 1440;
@@ -270,7 +270,7 @@ const Calendar = (() => {
         nowLine.style.top = (pct * 1440) + 'px';
         col.appendChild(nowLine);
       }
-      // Events
+      // 事件
       const dayEvs = timedEvents.filter(ev => {
         const span = eventDaySpan(ev, ws);
         return span.startDay === span.endDay && sameDay(new Date(ev.start), d);
@@ -437,7 +437,7 @@ const Calendar = (() => {
     });
   }
 
-  /* ---- Day view ---- */
+  /* ---- 日檢視 ---- */
   function renderDay() {
     const headerEl = document.getElementById('dayHeader');
     const body = document.getElementById('dayBody');
@@ -475,7 +475,7 @@ const Calendar = (() => {
     renderDayAllDay(d, allEvs);
   }
 
-  /* ---- Agenda view ---- */
+  /* ---- 議程檢視 ---- */
   function renderAgenda() {
     const list = document.getElementById('agendaList');
     if (!list) return;
@@ -492,7 +492,7 @@ const Calendar = (() => {
       return;
     }
 
-    // Group by day
+    // 依日期分組
     const byDay = {};
     for (const ev of evs) {
       const key = dateKey(new Date(ev.start));
@@ -544,7 +544,7 @@ const Calendar = (() => {
   }
 
   function render() {
-    // Hide/show views
+    // 隱藏／顯示檢視
     ['viewYear','viewMonth','viewWeek','viewDay','viewAgenda'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.add('d-none');
@@ -560,7 +560,7 @@ const Calendar = (() => {
     else if (currentView === 'day') renderDay();
     else if (currentView === 'agenda') renderAgenda();
 
-    // Scroll to 8am in week/day
+    // 在週／日檢視中捲動至上午 8 點
     if (currentView === 'week' || currentView === 'day') {
       setTimeout(() => {
         const wrap = document.querySelector('.pd-week-body-wrap');

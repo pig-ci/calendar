@@ -1,6 +1,20 @@
-/* Payas Days — Main application */
+/* Payas Days — 主應用程式 */
 (async () => {
   await Storage.open();
+  const seeded = await Storage.getSetting('seeded', false);
+  if (seeded) {
+    const sampleDescriptions = new Map([
+      ['日曆使用指南', '歡迎使用 Payas Days！這是一款重視隱私的個人日曆。你可以使用右下角的「＋」按鈕新增事件，並透過月、週、日或議程檢視管理行程。'],
+      ['團隊週會', '每週團隊同步會議，討論本週進度、目前阻礙與後續工作安排。'],
+    ]);
+    const events = await Storage.getAllEvents();
+    for (const event of events) {
+      if (sampleDescriptions.get(event.title) === event.description) {
+        await Storage.deleteEvent(event.id);
+      }
+    }
+    await Storage.setSetting('seeded', false);
+  }
   await Events.load();
   await Events.scheduleAllReminders();
   await loadTheme();
@@ -19,13 +33,13 @@
   Calendar.render();
   updateNavDate();
 
-  /* ========================= Theme ========================= */
+  /* ========================= 主題 ========================= */
   async function loadTheme() {
     const saved = await Storage.getSetting('theme', null);
     if (saved) {
       applyTheme(saved);
     } else {
-      // No explicit preference saved — honour OS setting
+      // 尚未儲存明確偏好設定，依照作業系統設定
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       applyTheme(prefersDark ? 'dark' : 'light');
     }
@@ -42,13 +56,13 @@
     await Storage.setSetting('theme', next);
   });
 
-  // Also listen for system preference
+  // 同時監聽系統偏好設定
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', async e => {
     const saved = await Storage.getSetting('theme', null);
     if (!saved) applyTheme(e.matches ? 'dark' : 'light');
   });
 
-  /* ========================= Nav controls ========================= */
+  /* ========================= 導覽控制項 ========================= */
   function updateNavDate() {
     const el = document.getElementById('navDateDisplay');
     if (el) el.textContent = Calendar.titleLabel();
@@ -60,7 +74,7 @@
     document.getElementById('btnTodayPill')?.addEventListener('click', () => { Calendar.setDate(new Date()); Calendar.render(); updateNavDate(); });
     document.getElementById('brandHomeLink')?.addEventListener('click', e => { e.preventDefault(); showCalendarView(); });
 
-    // Mobile menu toggle
+    // 切換行動版選單
     const menuBtn = document.getElementById('btnMobileMenu');
     const mobileMenu = document.getElementById('pdMobileMenu');
     menuBtn?.addEventListener('click', () => {
@@ -69,7 +83,7 @@
       mobileMenu.setAttribute('aria-hidden', String(!open));
       menuBtn.setAttribute('aria-expanded', String(open));
     });
-    // Close mobile menu on outside click
+    // 點擊選單外部時關閉行動版選單
     document.addEventListener('click', e => {
       if (mobileMenu?.classList.contains('open') && !mobileMenu.contains(e.target) && !menuBtn.contains(e.target)) {
         mobileMenu.classList.remove('open');
@@ -79,7 +93,7 @@
       }
     });
 
-    // Keyboard nav: arrow keys
+    // 鍵盤導覽：方向鍵
     document.addEventListener('keydown', ev => {
       if (ev.target.closest('input, textarea, select, [contenteditable]')) return;
       if (ev.key === 'ArrowLeft') { Calendar.navigate(-1); Calendar.render(); updateNavDate(); }
@@ -88,7 +102,7 @@
     });
   }
 
-  /* ========================= View buttons ========================= */
+  /* ========================= 檢視按鈕 ========================= */
   function initViewButtons() {
     document.querySelectorAll('.pd-view-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -113,14 +127,14 @@
     setActivePageLink(null);
   }
 
-  /* ========================= Nav page links ========================= */
+  /* ========================= 頁面導覽連結 ========================= */
   function initNavLinks() {
     document.querySelectorAll('[data-page]').forEach(link => {
       link.addEventListener('click', ev => {
         ev.preventDefault();
         const page = link.dataset.page;
         showPage(page);
-        // Close mobile menu if open
+        // 若行動版選單已開啟則將其關閉
         const mobileMenu = document.getElementById('pdMobileMenu');
         const menuBtn = document.getElementById('btnMobileMenu');
         mobileMenu?.classList.remove('open');
@@ -147,7 +161,7 @@
     initPageActions(name);
   }
 
-  /* ========================= Settings page ========================= */
+  /* ========================= 設定頁面 ========================= */
   function renderSettingsPage() {
     return `
     <div class="pd-page">
@@ -204,7 +218,7 @@
 
   function initPageActions(name) {
     if (name === 'settings') {
-      // Theme setting
+      // 主題設定
       const themeEl = document.getElementById('settingTheme');
       if (themeEl) {
         themeEl.value = document.documentElement.getAttribute('data-theme') || 'light';
@@ -213,7 +227,7 @@
           await Storage.setSetting('theme', themeEl.value);
         });
       }
-      // Notifications
+      // 通知
       const notifBtn = document.getElementById('btnRequestNotif');
       if (notifBtn && 'Notification' in window) {
         const updateNotifBtn = perm => {
@@ -232,21 +246,21 @@
           if (perm === 'granted') await Events.scheduleAllReminders();
         });
       }
-      // Export ICS
+      // 匯出 ICS
       document.getElementById('btnExportICS')?.addEventListener('click', async () => {
         const evs = Events.getAll();
         const ics = ICS.exportICS(evs);
         downloadText(ics, 'payas-days.ics', 'text/calendar');
       });
-      // Export MD
+      // 匯出 Markdown
       document.getElementById('btnExportMD')?.addEventListener('click', async () => {
         const files = await Storage.exportAllMarkdown();
         if (files.length === 0) { alert('目前沒有可匯出的事件。'); return; }
-        // Bundle as one text file with separators
+        // 使用分隔標記合併為單一文字檔
         const bundle = files.map(f => `# FILE: ${f.name}\n\n${f.content}`).join('\n\n---\n\n');
         downloadText(bundle, 'payas-days-events.md', 'text/markdown');
       });
-      // Import ICS
+      // 匯入 ICS
       document.getElementById('importICSInput')?.addEventListener('change', async e => {
         const file = e.target.files[0];
         if (!file) return;
@@ -257,7 +271,7 @@
         alert(`成功匯入 ${imported.length} 個事件。`);
         showPage('settings');
       });
-      // Import MD
+      // 匯入 Markdown
       document.getElementById('importMDInput')?.addEventListener('change', async e => {
         const files = [...e.target.files];
         const fileObjs = await Promise.all(files.map(async f => ({ name: f.name, content: await f.text() })));
@@ -266,7 +280,7 @@
         alert(`成功匯入 ${imported.length} 個事件。`);
         showPage('settings');
       });
-      // Drag-drop import
+      // 拖放匯入
       ['importICSLabel','importMDLabel'].forEach(id => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -276,13 +290,13 @@
           e.preventDefault(); el.classList.remove('drag-over');
           const input = el.querySelector('input[type=file]');
           if (input && e.dataTransfer.files.length) {
-            // Trigger same handler via FileList
+            // 透過 FileList 呼叫相同的處理程序
             Object.defineProperty(input, 'files', { value: e.dataTransfer.files, configurable: true });
             input.dispatchEvent(new Event('change'));
           }
         });
       });
-      // Clear all
+      // 全部清除
       document.getElementById('btnClearAll')?.addEventListener('click', async () => {
         if (!confirm('確定要刪除所有事件嗎？此操作無法復原。')) return;
         await Storage.clearAllEvents();
@@ -292,7 +306,7 @@
     }
   }
 
-  /* ========================= About page ========================= */
+  /* ========================= 關於頁面 ========================= */
   function renderAboutPage() {
     return `
     <div class="pd-page">
@@ -328,7 +342,7 @@
     </div>`;
   }
 
-  /* ========================= License page ========================= */
+  /* ========================= 授權頁面 ========================= */
   function renderLicensePage() {
     return `
     <div class="pd-page">
@@ -359,12 +373,12 @@ SOFTWARE.</pre>
     </div>`;
   }
 
-  /* ========================= FAB ========================= */
+  /* ========================= 快速新增按鈕 ========================= */
   function initFab() {
     document.getElementById('btnFab').addEventListener('click', () => openNewEventModal(new Date()));
   }
 
-  /* ========================= Color picker ========================= */
+  /* ========================= 顏色選擇器 ========================= */
   function initColorPicker() {
     const picker = document.getElementById('colorPicker');
     if (!picker) return;
@@ -396,7 +410,7 @@ SOFTWARE.</pre>
     });
   }
 
-  /* ========================= Timezones ========================= */
+  /* ========================= 時區 ========================= */
   function initTimezones() {
     const sel = document.getElementById('evTimezone');
     if (!sel) return;
@@ -408,7 +422,7 @@ SOFTWARE.</pre>
     sel.innerHTML = zones.map(z => `<option value="${z}"${z===local?' selected':''}>${z}</option>`).join('');
   }
 
-  /* ========================= Event form ========================= */
+  /* ========================= 事件表單 ========================= */
   let editingEventId = null;
   let pendingDeleteEventId = null;
 
@@ -419,7 +433,7 @@ SOFTWARE.</pre>
     document.getElementById('btnExportEvent').classList.add('d-none');
     resetForm();
 
-    // Pre-fill date
+    // 預先填入日期
     const d = date || new Date();
     const start = new Date(d); start.setMinutes(0,0,0);
     const end = new Date(start); end.setHours(end.getHours() + 1);
@@ -611,7 +625,7 @@ SOFTWARE.</pre>
       attachments: getTagValues('attachmentList'),
     };
 
-    // Conflict detection
+    // 衝突偵測
     const conflicts = Events.detectConflicts(ev);
     if (conflicts.length > 0) {
       const names = conflicts.map(c => c.title || '未命名事件').join('、');
@@ -623,7 +637,7 @@ SOFTWARE.</pre>
     Calendar.render();
   }
 
-  /* ========================= Tag lists ========================= */
+  /* ========================= 標籤清單 ========================= */
   function addTagToList(containerId, value, suffix) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -646,7 +660,7 @@ SOFTWARE.</pre>
     return [...document.querySelectorAll(`#${containerId} .pd-tag-chip`)].map(c => c.dataset.value);
   }
 
-  /* ========================= Event Popover ========================= */
+  /* ========================= 事件快顯視窗 ========================= */
   function initPopover() {
     document.getElementById('popClose').addEventListener('click', closePopover);
     document.getElementById('popEdit').addEventListener('click', () => {
@@ -686,7 +700,7 @@ SOFTWARE.</pre>
     if (ev.label) body += `<div class="pd-popover-row"><i class="fa-solid fa-tag"></i><span>${escapeHTML(ev.label)}</span></div>`;
     document.getElementById('popBody').innerHTML = body;
 
-    // Position near anchor
+    // 定位於錨點附近
     pop.classList.remove('d-none');
     if (anchorEl) {
       const rect = anchorEl.getBoundingClientRect();
@@ -766,7 +780,7 @@ SOFTWARE.</pre>
     Calendar.render();
   }
 
-  /* ========================= Search ========================= */
+  /* ========================= 搜尋 ========================= */
   function closeSearch() {
     const bar = document.getElementById('searchBar');
     const btn = document.getElementById('btnSearch');
@@ -799,7 +813,7 @@ SOFTWARE.</pre>
 
     document.getElementById('btnSearchClose').addEventListener('click', closeSearch);
 
-    // Press / to open search
+    // 按下 / 開啟搜尋
     document.addEventListener('keydown', ev => {
       if (ev.key === '/' && !ev.target.closest('input, textarea, select, [contenteditable]')) {
         ev.preventDefault();
@@ -853,7 +867,7 @@ SOFTWARE.</pre>
     });
   }
 
-  /* ========================= Utilities ========================= */
+  /* ========================= 工具函式 ========================= */
   function escapeHTML(s) {
     return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
@@ -871,21 +885,4 @@ SOFTWARE.</pre>
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  // Seed sample events on first load
-  const seeded = await Storage.getSetting('seeded', false);
-  if (!seeded) {
-    const now = new Date();
-    const fmt = (d) => d.toISOString();
-    const today8 = new Date(now); today8.setHours(9,0,0,0);
-    const today9 = new Date(now); today9.setHours(10,0,0,0);
-    const tomorrow14 = new Date(now); tomorrow14.setDate(tomorrow14.getDate()+1); tomorrow14.setHours(14,0,0,0);
-    const tomorrow15 = new Date(now); tomorrow15.setDate(tomorrow15.getDate()+1); tomorrow15.setHours(15,30,0,0);
-
-    await Events.save({ title: '日曆使用指南', type: 'important', description: '歡迎使用 Payas Days！這是一款重視隱私的個人日曆。你可以使用右下角的「＋」按鈕新增事件，並透過月、週、日或議程檢視管理行程。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '使用指南', recurrence: '', reminders: [], attendees: [], attachments: [] });
-    await Events.save({ title: '團隊週會', type: 'important', description: '每週團隊同步會議，討論本週進度、目前阻礙與後續工作安排。', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '第一會議室' });
-
-    await Storage.setSetting('seeded', true);
-    await Events.load();
-    Calendar.render();
-  }
 })();

@@ -1,5 +1,5 @@
 /* ══════════════════════════════════════
-   TOKENS  — Payas design system
+   設計變數 — Payas 設計系統
 ══════════════════════════════════════ */
 :root {
   --bg-app:        #eeeae2;
@@ -23,7 +23,7 @@
   --scrollbar:     #ccc8bc;
   --danger:        #dc2626;
 
-  /* Legacy aliases — keep for calendar-specific classes */
+  /* 舊版別名 — 保留供日曆專用類別使用 */
   --pd-bg:              var(--bg-app);
   --pd-bg-secondary:    var(--bg-sidebar);
   --pd-bg-tertiary:     var(--bg-hover);
@@ -77,7 +77,7 @@
 }
 
 /* ══════════════════════════════════════
-   BASE
+   基礎樣式
 ══════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -98,7 +98,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   HEADER SHELL
+   頁首區塊
 ══════════════════════════════════════ */
 .pd-header {
   background: var(--bg-bar);
@@ -109,7 +109,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   TITLEBAR  (44 px — matches Payas apps)
+   標題列（44 px — 與 Payas 應用程式一致）
 ══════════════════════════════════════ */
 .pd-topbar {
   display: grid;
@@ -120,7 +120,7 @@ body {
   gap: 6px;
 }
 
-/* ── Brand ── */
+/* ── 品牌 ── */
 .pd-brand {
   font-family: var(--pd-font-brand);
   font-size: 15px;
@@ -148,7 +148,7 @@ body {
   font-family: var(--pd-font-brand);
 }
 
-/* ── Date navigation ── */
+/* ── 日期導覽 ── */
 .pd-date-nav {
   display: flex;
   align-items: center;
@@ -189,7 +189,7 @@ body {
 }
 .pd-date-display:hover { background: var(--bg-hover); }
 
-/* ── Right action buttons ── */
+/* ── 右側操作按鈕 ── */
 .pd-topbar-actions {
   display: flex;
   align-items: center;
@@ -197,7 +197,7 @@ body {
   flex-shrink: 0;
 }
 
-/* shared icon/text button — matches mbar-btn / tb-btn */
+/* 共用圖示／文字按鈕 — 對應 mbar-btn／tb-btn */
 .pd-action-btn {
   height: 28px;
   padding: 0 7px;
@@ -227,11 +227,11 @@ body {
 }
 @media (min-width: 1280px) { .pd-action-label { display: inline; } }
 
-/* theme icon spin */
+/* 主題圖示旋轉效果 */
 .pd-theme-icon { display: flex; transition: transform .3s ease; }
 .pd-theme-btn:hover .pd-theme-icon { transform: rotate(22deg); }
 
-/* vertical divider */
+/* 垂直分隔線 */
 .pd-vdivider {
   width: 1px;
   height: 18px;
@@ -243,7 +243,7 @@ body {
 .pd-page-links { display: flex; align-items: center; gap: 1px; }
 
 /* ══════════════════════════════════════
-   TABSBAR  (36 px — matches editor tabbar)
+   分頁列（36 px — 與編輯器分頁列一致）
 ══════════════════════════════════════ */
 .pd-tabsbar {
   display: flex;
@@ -263,7 +263,7 @@ body {
   height: 100%;
 }
 
-/* view tab — matches .tab-item / sb-tab style */
+/* 檢視分頁 — 對應 .tab-item／sb-tab 樣式 */
 .pd-view-btn {
   display: inline-flex;
   align-items: center;
@@ -286,7 +286,7 @@ body {
 .pd-view-btn:hover { color: var(--accent); background: var(--bg-hover); }
 .pd-view-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-/* today pill */
+/* 今日標籤 */
 .pd-tabs-right { display: flex; align-items: center; }
 .pd-today-pill {
   height: 24px;
@@ -305,7 +305,7 @@ body {
 .pd-today-pill:hover { background: var(--bg-hover); color: var(--text-1); border-color: var(--text-3); }
 
 /* ══════════════════════════════════════
-   MOBILE SLIDE-DOWN MENU
+   行動版下拉選單
 ══════════════════════════════════════ */
 .pd-mobile-menu {
   overflow: hidden;
@@ -347,7 +347,7 @@ body {
 .pd-menu-btn.open #mobileMenuIcon { transform: rotate(90deg); }
 
 /* ══════════════════════════════════════
-   SEARCH BAR  (matches find-bar)
+   搜尋列（與 find-bar 一致）
 ══════════════════════════════════════ */
 .pd-search-bar {
   overflow: hidden;
@@ -394,8 +394,8 @@ body {
 .pd-search-result-item:last-child { border-bottom: none; }
 
 /* ══════════════════════════════════════
-   SHARED MODAL BUTTONS
-   Override Bootstrap .btn/.btn-sm specificity with !important on layout props
+   共用對話框按鈕
+   在版面屬性上使用 !important 覆寫 Bootstrap .btn／.btn-sm 的優先順序
 ══════════════════════════════════════ */
 .pd-btn-ghost {
   height: 28px !important;
@@ -458,7 +458,7 @@ body {
 .pd-btn-danger:hover { background: rgba(220,38,38,.08) !important; }
 .pd-btn-danger:focus { box-shadow: none !important; }
 
-/* icon-only alias used in popovers */
+/* 僅含圖示的別名，供快顯視窗使用 */
 .pd-btn-icon {
   width: 28px;
   height: 28px;
@@ -477,7 +477,7 @@ body {
 .pd-btn-icon:active { transform: scale(.91); }
 
 /* ══════════════════════════════════════
-   MAIN LAYOUT
+   主要版面
 ══════════════════════════════════════ */
 .pd-main {
   flex: 1;
@@ -506,7 +506,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   YEAR VIEW
+   年檢視
 ══════════════════════════════════════ */
 .pd-year-grid {
   flex: 1;
@@ -562,7 +562,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   MONTH VIEW
+   月檢視
 ══════════════════════════════════════ */
 .pd-month-grid-header {
   display: grid;
@@ -670,7 +670,7 @@ body {
 .pd-more-chip:hover { color: var(--accent); }
 
 /* ══════════════════════════════════════
-   WEEK / DAY VIEW
+   週／日檢視
 ══════════════════════════════════════ */
 .pd-week-scroll-outer { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 
@@ -815,7 +815,7 @@ body {
   background: var(--accent-lt);
 }
 
-/* Day view header */
+/* 日檢視標題列 */
 .pd-day-header {
   background: var(--bg-sidebar);
   border-bottom: 1px solid var(--border);
@@ -832,7 +832,7 @@ body {
 .pd-day-body { flex: 1; display: flex; min-height: 1440px; }
 
 /* ══════════════════════════════════════
-   AGENDA VIEW
+   議程檢視
 ══════════════════════════════════════ */
 .pd-agenda-list {
   flex: 1;
@@ -885,7 +885,7 @@ body {
 .pd-agenda-empty { text-align: center; color: var(--text-3); padding: 48px 16px; font-size: 13px; }
 
 /* ══════════════════════════════════════
-   FAB
+   快速新增按鈕
 ══════════════════════════════════════ */
 .pd-fab {
   position: fixed;
@@ -915,7 +915,7 @@ body {
 [data-theme="dark"] .pd-fab { box-shadow: 0 4px 14px rgba(82,183,136,.28); }
 
 /* ══════════════════════════════════════
-   EVENT POPOVER
+   事件快顯視窗
 ══════════════════════════════════════ */
 .pd-event-popover {
   position: fixed;
@@ -948,7 +948,7 @@ body {
 .pd-popover-description { white-space: pre-wrap; }
 
 /* ══════════════════════════════════════
-   MODAL
+   對話框
 ══════════════════════════════════════ */
 .pd-modal-content {
   background: var(--bg-modal);
@@ -1083,13 +1083,13 @@ body {
   border-top: none !important;
   border-left: none !important;
   border-right: none !important;
-  border-bottom: 1px solid var(--border) !important;
+  border-bottom: 1px solid var(--text-3) !important;
   border-radius: 0 !important;
   box-shadow: none !important;
 }
 .pd-input-title:focus { border-bottom-color: var(--accent) !important; box-shadow: none !important; }
 
-/* Bootstrap dark-mode colour-scheme interference override */
+/* 覆寫 Bootstrap 深色模式的色彩配置干擾 */
 .pd-modal-content,
 .pd-modal-content input,
 .pd-modal-content select,
@@ -1118,7 +1118,7 @@ body {
 #evTimezone { min-height: 36px; }
 
 /* ══════════════════════════════════════
-   COLOR PICKER
+   顏色選擇器
 ══════════════════════════════════════ */
 .pd-color-picker { display: flex; gap: 7px; flex-wrap: wrap; }
 .pd-color-swatch {
@@ -1135,7 +1135,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   PAGE VIEWS  (Settings / About / License)
+   頁面檢視（設定／關於／授權）
 ══════════════════════════════════════ */
 .pd-page-view {
   flex: 1;
@@ -1173,7 +1173,7 @@ body {
 .pd-setting-sub { font-size: 11.5px; color: var(--text-3); margin-top: 2px; }
 
 /* ══════════════════════════════════════
-   TAG CHIPS
+   標籤項目
 ══════════════════════════════════════ */
 .pd-tag-chip {
   display: inline-flex;
@@ -1191,7 +1191,7 @@ body {
 .pd-tag-chip .remove-tag:hover { color: var(--danger); }
 
 /* ══════════════════════════════════════
-   ALL-DAY STRIP
+   全天事件列
 ══════════════════════════════════════ */
 .pd-allday-strip-wrap {
   display: flex;
@@ -1245,7 +1245,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   IMPORT AREA
+   匯入區域
 ══════════════════════════════════════ */
 .pd-import-area {
   border: 2px dashed var(--border);
@@ -1264,7 +1264,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   FORM ELEMENTS  (dark mode fix)
+   表單元素（深色模式修正）
 ══════════════════════════════════════ */
 .form-check-input {
   background-color: var(--bg-chip);
@@ -1276,7 +1276,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   RESPONSIVE
+   響應式版面
 ══════════════════════════════════════ */
 @media (max-width: 576px) {
   .pd-year-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; }
@@ -1306,7 +1306,7 @@ body {
 }
 
 /* ══════════════════════════════════════
-   SCROLLBAR
+   捲軸
 ══════════════════════════════════════ */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
@@ -1334,7 +1334,7 @@ body {
 .pd-week-body-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
 
 /* ══════════════════════════════════════
-   ANIMATIONS
+   動畫效果
 ══════════════════════════════════════ */
 @keyframes pdFadeIn {
   from { opacity: 0; transform: translateY(3px); }
