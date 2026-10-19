@@ -95,6 +95,7 @@ const Storage = (() => {
       start: ev.start,
       end: ev.end,
       allDay: ev.allDay || false,
+      type: ev.type || 'important',
       timezone: ev.timezone || 'UTC',
       location: ev.location || '',
       attendees: ev.attendees || [],

@@ -213,6 +213,15 @@
             <input type="text" class="form-control pd-input pd-input-title" id="evTitle" placeholder="事件標題" required />
           </div>
 
+          <div class="mb-3">
+            <label class="form-label pd-label" for="evType">事件類型 <span class="text-danger">*</span></label>
+            <select class="form-select pd-input" id="evType" required>
+              <option value="" selected disabled>請選擇事件類型</option>
+              <option value="important">重要</option>
+              <option value="detail">細流</option>
+            </select>
+          </div>
+
           <!-- Dates row -->
           <div class="row g-2 mb-3">
             <div class="col-12">

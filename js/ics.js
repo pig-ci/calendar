@@ -3,9 +3,13 @@ const ICS = (() => {
   function pad(n) { return String(n).padStart(2, '0'); }
 
   function toICSDate(iso, allDay) {
+    if (allDay) {
+      const date = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (date) return `${date[1]}${date[2]}${date[3]}`;
+    }
     const d = new Date(iso);
     if (allDay) {
-      return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}`;
+      return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
     }
     return `${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}T` +
            `${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}Z`;
@@ -46,6 +50,7 @@ const ICS = (() => {
       lines.push('BEGIN:VEVENT');
       lines.push(`UID:${ev.id}@payas-days`);
       lines.push(`SUMMARY:${escape(ev.title)}`);
+      lines.push(`X-PAYAS-TYPE:${escape(ev.type || 'important')}`);
       lines.push(dtstart);
       lines.push(dtend);
       if (ev.description) lines.push(`DESCRIPTION:${escape(ev.description)}`);
@@ -122,6 +127,7 @@ const ICS = (() => {
         switch (propBase) {
           case 'UID': current.id = val.replace('@payas-days', '') || ('import-' + Date.now()); break;
           case 'SUMMARY': current.title = unescape(val); break;
+          case 'X-PAYAS-TYPE': current.type = unescape(val); break;
           case 'DESCRIPTION': current.description = unescape(val); break;
           case 'LOCATION': current.location = unescape(val); break;
           case 'DTSTART': {

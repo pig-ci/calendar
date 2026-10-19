@@ -79,6 +79,9 @@ const Calendar = (() => {
   function sameDay(a, b) {
     return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate();
   }
+  function dateKey(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
   function isToday(d) { return sameDay(d, new Date()); }
   function fmtTime(iso) {
     const d = new Date(iso);
@@ -138,7 +141,7 @@ const Calendar = (() => {
         week.appendChild(cell);
       }
 
-      const weekEvents = eventsInRange.map(event => ({
+      const weekEvents = eventsInRange.filter(Events.isImportant).map(event => ({
         event,
         ...eventDaySpan(event, weekStartDate)
       })).filter(item => item.startDay <= 6 && item.endDay >= 0)
@@ -229,7 +232,7 @@ const Calendar = (() => {
 
     const ws = weekStart(currentDate);
     const rangeEnd = new Date(ws); rangeEnd.setDate(rangeEnd.getDate() + 6); rangeEnd.setHours(23,59,59,999);
-    const eventsInRange = Events.getInRange(ws, rangeEnd);
+    const eventsInRange = Events.getInRange(ws, rangeEnd).filter(Events.isImportant);
 
     // Header
     headerEl.innerHTML = '<div style="width:56px;flex-shrink:0;border-right:1px solid var(--pd-border)"></div>';
@@ -497,7 +500,7 @@ const Calendar = (() => {
     // Group by day
     const byDay = {};
     for (const ev of evs) {
-      const key = new Date(ev.start).toISOString().slice(0, 10);
+      const key = dateKey(new Date(ev.start));
       if (!byDay[key]) byDay[key] = [];
       byDay[key].push(ev);
     }

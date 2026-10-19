@@ -441,6 +441,7 @@ SOFTWARE.</pre>
     document.getElementById('btnExportEvent').classList.remove('d-none');
 
     document.getElementById('evTitle').value = ev.title || '';
+    document.getElementById('evType').value = ev.type || '';
     document.getElementById('evDescription').value = ev.description || '';
     document.getElementById('evLocation').value = ev.location || '';
     document.getElementById('evLabel').value = ev.label || '';
@@ -552,6 +553,12 @@ SOFTWARE.</pre>
   async function saveEventFromForm() {
     const title = document.getElementById('evTitle').value.trim();
     if (!title) { document.getElementById('evTitle').focus(); return; }
+    const type = document.getElementById('evType').value;
+    if (!type) {
+      alert('請選擇事件類型（重要或細流）。');
+      document.getElementById('evType').focus();
+      return;
+    }
 
     const allDay = document.getElementById('evAllDay').checked;
     let start, end;
@@ -565,11 +572,18 @@ SOFTWARE.</pre>
     } else {
       start = document.getElementById('evStart').value;
       end = document.getElementById('evEnd').value;
+      if (start && end && end <= start) {
+        alert('結束時間必須晚於開始時間。');
+        return;
+      }
     }
     if (!start || !end) { alert('請設定開始與結束日期／時間。'); return; }
     const startTime = new Date(start).getTime();
     const endTime = new Date(end).getTime();
-    if (endTime < startTime) { alert('結束時間不可早於開始時間。'); return; }
+    if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) {
+      alert('開始與結束日期／時間無效，請重新設定。');
+      return;
+    }
     if (!allDay && endTime - startTime < 15 * 60000) {
       alert('事件長度不得少於 15 分鐘。');
       return;
@@ -582,6 +596,7 @@ SOFTWARE.</pre>
     const ev = {
       id: editingEventId || undefined,
       title,
+      type,
       description: document.getElementById('evDescription').value.trim(),
       start,
       end,
@@ -866,8 +881,8 @@ SOFTWARE.</pre>
     const tomorrow14 = new Date(now); tomorrow14.setDate(tomorrow14.getDate()+1); tomorrow14.setHours(14,0,0,0);
     const tomorrow15 = new Date(now); tomorrow15.setDate(tomorrow15.getDate()+1); tomorrow15.setHours(15,30,0,0);
 
-    await Events.save({ title: '日曆使用指南', description: '歡迎使用 Payas Days！這是一款重視隱私的個人日曆。你可以使用右下角的「＋」按鈕新增事件，並透過月、週、日或議程檢視管理行程。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '使用指南', recurrence: '', reminders: [], attendees: [], attachments: [] });
-    await Events.save({ title: '團隊週會', description: '每週團隊同步會議，討論本週進度、目前阻礙與後續工作安排。', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '第一會議室' });
+    await Events.save({ title: '日曆使用指南', type: 'important', description: '歡迎使用 Payas Days！這是一款重視隱私的個人日曆。你可以使用右下角的「＋」按鈕新增事件，並透過月、週、日或議程檢視管理行程。', start: fmt(today8), end: fmt(today9), allDay: false, color: 'blue', label: '使用指南', recurrence: '', reminders: [], attendees: [], attachments: [] });
+    await Events.save({ title: '團隊週會', type: 'important', description: '每週團隊同步會議，討論本週進度、目前阻礙與後續工作安排。', start: fmt(tomorrow14), end: fmt(tomorrow15), allDay: false, color: 'teal', label: '工作', recurrence: 'FREQ=WEEKLY;BYDAY=MO', reminders: [10], attendees: [], attachments: [], location: '第一會議室' });
 
     await Storage.setSetting('seeded', true);
     await Events.load();

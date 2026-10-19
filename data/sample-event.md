@@ -9,6 +9,7 @@ description: |
 start: 2026-04-18T09:00:00
 end: 2026-04-18T09:30:00
 allDay: false
+type: important
 timezone: Asia/Colombo
 location: 線上會議室
 attendees: []

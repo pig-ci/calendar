@@ -38,12 +38,21 @@ const Events = (() => {
 
   function getById(id) { return cache.find(e => e.id === id); }
 
+  function isImportant(ev) { return ev.type !== 'detail'; }
+
+  function hasValidRange(ev) {
+    const start = new Date(ev.start).getTime();
+    const end = new Date(ev.end).getTime();
+    return Number.isFinite(start) && Number.isFinite(end) && end > start;
+  }
+
   /**
    * Returns all events (including recurrence expansions) that overlap [start, end].
    */
   function getInRange(rangeStart, rangeEnd) {
     const results = [];
     for (const ev of cache) {
+      if (!hasValidRange(ev)) continue;
       if (ev.recurrence) {
         const expanded = Recurrence.expand(ev, rangeStart, rangeEnd);
         results.push(...expanded);
@@ -68,12 +77,12 @@ const Events = (() => {
 
   /* ---- Conflict detection ---- */
   function detectConflicts(newEv) {
-    if (newEv.allDay) return [];
+    if (newEv.allDay || !hasValidRange(newEv)) return [];
     const ns = new Date(newEv.start);
     const ne = new Date(newEv.end);
     const candidates = [];
     for (const ev of cache) {
-      if (ev.id === newEv.id || ev.allDay) continue;
+      if (ev.id === newEv.id || ev.allDay || !hasValidRange(ev)) continue;
       if (ev.recurrence) {
         candidates.push(...Recurrence.expand(ev, ns, ne));
       } else {
@@ -91,7 +100,7 @@ const Events = (() => {
   const scheduledTimers = {};
 
   function scheduleReminders(ev) {
-    if (!ev.reminders || !ev.reminders.length) return;
+    if (!hasValidRange(ev) || !ev.reminders || !ev.reminders.length) return;
     if (!('Notification' in window)) return;
     const start = new Date(ev.start);
     for (const mins of ev.reminders) {
@@ -121,6 +130,6 @@ const Events = (() => {
 
   return {
     load, save, remove, getAll, getById, getInRange, search,
-    detectConflicts, scheduleAllReminders, colorHex, EVENT_COLORS
+    detectConflicts, scheduleAllReminders, colorHex, isImportant, EVENT_COLORS
   };
 })();
