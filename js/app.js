@@ -11,6 +11,7 @@
   initNavControls();
   initFab();
   initEventForm();
+  initDeleteConfirmation();
   initSearch();
   initPopover();
   Calendar.on('eventClick', showEventPopover);
@@ -406,6 +407,7 @@ SOFTWARE.</pre>
 
   /* ========================= Event form ========================= */
   let editingEventId = null;
+  let pendingDeleteEventId = null;
 
   function openNewEventModal(date) {
     editingEventId = null;
@@ -505,12 +507,9 @@ SOFTWARE.</pre>
 
     document.getElementById('btnSaveEvent').addEventListener('click', saveEventFromForm);
 
-    document.getElementById('btnDeleteEvent').addEventListener('click', async () => {
+    document.getElementById('btnDeleteEvent').addEventListener('click', async event => {
       if (!editingEventId) return;
-      if (!confirm('確定要刪除此事件嗎？')) return;
-      await Events.remove(editingEventId);
-      bootstrap.Modal.getInstance(document.getElementById('eventModal'))?.hide();
-      Calendar.render();
+      await requestEventDelete(editingEventId, event.shiftKey);
     });
 
     document.getElementById('btnExportEvent').addEventListener('click', () => {
@@ -637,12 +636,9 @@ SOFTWARE.</pre>
       closePopover();
       openEditModal(id);
     });
-    document.getElementById('popDelete').addEventListener('click', async () => {
+    document.getElementById('popDelete').addEventListener('click', async event => {
       const id = document.getElementById('eventPopover').dataset.eventId;
-      if (!confirm('確定要刪除此事件嗎？')) return;
-      await Events.remove(id);
-      closePopover();
-      Calendar.render();
+      await requestEventDelete(id, event.shiftKey);
     });
     document.addEventListener('click', e => {
       const pop = document.getElementById('eventPopover');
@@ -687,6 +683,64 @@ SOFTWARE.</pre>
 
   function closePopover() {
     document.getElementById('eventPopover').classList.add('d-none');
+  }
+
+  function initDeleteConfirmation() {
+    const dialog = document.getElementById('deleteConfirm');
+    document.getElementById('cancelDeleteEvent').addEventListener('click', closeDeleteConfirmation);
+    document.getElementById('confirmDeleteEvent').addEventListener('click', async () => {
+      const id = pendingDeleteEventId;
+      finishDeleteConfirmation();
+      if (id) await deleteEvent(id);
+    });
+    dialog.addEventListener('cancel', event => {
+      event.preventDefault();
+      closeDeleteConfirmation();
+    });
+    dialog.addEventListener('close', () => {
+      pendingDeleteEventId = null;
+      dialog.classList.remove('is-closing');
+    });
+  }
+
+  async function requestEventDelete(id, skipConfirmation) {
+    if (skipConfirmation) {
+      await deleteEvent(id);
+      return;
+    }
+    pendingDeleteEventId = id;
+    const dialog = document.getElementById('deleteConfirm');
+    dialog.showModal();
+    document.getElementById('confirmDeleteEvent').focus();
+  }
+
+  function closeDeleteConfirmation() {
+    const dialog = document.getElementById('deleteConfirm');
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    dialog.classList.add('is-closing');
+    const finishClosing = event => {
+      if (event.target === dialog && event.animationName === 'pdDeleteSlideOut' && dialog.open) {
+        dialog.removeEventListener('animationend', finishClosing);
+        dialog.close();
+      }
+    };
+    dialog.addEventListener('animationend', finishClosing);
+  }
+
+  function finishDeleteConfirmation() {
+    const dialog = document.getElementById('deleteConfirm');
+    if (dialog.open) dialog.close();
+    else pendingDeleteEventId = null;
+  }
+
+  async function deleteEvent(id) {
+    await Events.remove(id);
+    if (editingEventId === id) {
+      bootstrap.Modal.getInstance(document.getElementById('eventModal'))?.hide();
+      editingEventId = null;
+    }
+    if (document.getElementById('eventPopover').dataset.eventId === id) closePopover();
+    Calendar.render();
   }
 
   /* ========================= Search ========================= */

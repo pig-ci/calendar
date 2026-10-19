@@ -829,6 +829,73 @@ body {
   color: var(--text-1);
   box-shadow: var(--shadow-lg);
 }
+.pd-delete-dialog {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: min(calc(100% - 32px), 520px);
+  max-width: none;
+  max-height: calc(100% - 32px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: var(--text-1);
+  transform: translate(-50%, -50%);
+}
+.pd-delete-dialog[open] {
+  animation: pdDeleteSlideIn 240ms ease-out both;
+}
+.pd-delete-dialog[open].is-closing {
+  animation: pdDeleteSlideOut 180ms ease-in both;
+}
+@keyframes pdDeleteSlideIn {
+  from { opacity: 0; transform: translate(-50%, calc(-50% - 48px)); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+@keyframes pdDeleteSlideOut {
+  from { opacity: 1; transform: translate(-50%, -50%); }
+  to { opacity: 0; transform: translate(-50%, calc(-50% - 48px)); }
+}
+.pd-delete-dialog::backdrop {
+  background: rgba(0, 0, 0, .45);
+  animation: pdDeleteBackdropIn 180ms ease-out both;
+}
+@keyframes pdDeleteBackdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pd-delete-dialog[open],
+  .pd-delete-dialog::backdrop {
+    animation-duration: 1ms;
+  }
+}
+.pd-delete-confirm-content {
+  padding: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--pd-radius-lg);
+  background: var(--bg-modal);
+  color: var(--text-1);
+  box-shadow: var(--shadow-lg);
+}
+.pd-delete-confirm-content h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.pd-delete-confirm-content h2 i { color: var(--danger); }
+.pd-delete-confirm-content p {
+  margin: 0 0 24px;
+  color: var(--text-2);
+  font-size: 14px;
+}
+.pd-delete-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
 .pd-modal-header {
   border-bottom: 1px solid var(--border);
   padding: 13px 18px;
