@@ -22,13 +22,15 @@ const Calendar = (() => {
   }
 
   function navigate(dir) {
-    if (currentView === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
+    if (currentView === 'year') currentDate.setFullYear(currentDate.getFullYear() + dir);
+    else if (currentView === 'month') currentDate.setMonth(currentDate.getMonth() + dir);
     else if (currentView === 'week') currentDate.setDate(currentDate.getDate() + dir * 7);
     else if (currentView === 'day') currentDate.setDate(currentDate.getDate() + dir);
     else if (currentView === 'agenda') currentDate.setDate(currentDate.getDate() + dir * 30);
   }
 
   function titleLabel() {
+    if (currentView === 'year') return `${currentDate.getFullYear()}年`;
     if (currentView === 'month') return `${currentDate.getFullYear()}年${MONTHS[currentDate.getMonth()]}`;
     if (currentView === 'week') {
       const ws = weekStart(currentDate);
@@ -148,6 +150,54 @@ const Calendar = (() => {
       cell.addEventListener('click', () => onDayClick(new Date(cellDate)));
       grid.appendChild(cell);
       cursor.setDate(cursor.getDate() + 1);
+    }
+  }
+
+  /* ---- Year view ---- */
+  function renderYear() {
+    const grid = document.getElementById('yearGrid');
+    if (!grid) return;
+
+    const year = currentDate.getFullYear();
+    grid.innerHTML = '';
+
+    for (let month = 0; month < 12; month++) {
+      const monthEl = document.createElement('section');
+      monthEl.className = 'pd-year-month';
+
+      const heading = document.createElement('h2');
+      heading.className = 'pd-year-month-title';
+      heading.textContent = MONTHS[month];
+      monthEl.appendChild(heading);
+
+      const daysGrid = document.createElement('div');
+      daysGrid.className = 'pd-year-month-grid';
+      DAYS.forEach(day => {
+        const dayName = document.createElement('span');
+        dayName.className = 'pd-year-weekday';
+        dayName.textContent = day;
+        daysGrid.appendChild(dayName);
+      });
+
+      const firstWeekday = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      for (let blank = 0; blank < firstWeekday; blank++) {
+        const emptyDay = document.createElement('span');
+        emptyDay.className = 'pd-year-day empty';
+        emptyDay.setAttribute('aria-hidden', 'true');
+        daysGrid.appendChild(emptyDay);
+      }
+      for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dayEl = document.createElement('span');
+        dayEl.className = 'pd-year-day' + (isToday(date) ? ' today' : '');
+        dayEl.textContent = day;
+        dayEl.title = `${year}年${month + 1}月${day}日`;
+        daysGrid.appendChild(dayEl);
+      }
+
+      monthEl.appendChild(daysGrid);
+      grid.appendChild(monthEl);
     }
   }
 
@@ -275,20 +325,42 @@ const Calendar = (() => {
     strip.appendChild(col);
   }
 
-  function placeWeekEvents(evs, col) {
+  function placeWeekEvents(evs, col, showDetails = false) {
     evs.forEach(ev => {
       const s = new Date(ev.start);
       const e = new Date(ev.end);
       const startMin = s.getHours() * 60 + s.getMinutes();
       const durMin = Math.max(15, (e - s) / 60000);
       const el = document.createElement('div');
-      el.className = 'pd-week-event';
+      el.className = 'pd-week-event' + (showDetails ? ' pd-day-event' : '');
       el.style.top = (startMin) + 'px';
       el.style.height = durMin + 'px';
       el.style.background = Events.colorHex(ev.color);
-      el.textContent = ev.title || '未命名事件';
       el.title = ev.title;
       el.dataset.id = ev._masterId || ev.id;
+
+      if (showDetails) {
+        const title = document.createElement('div');
+        title.className = 'pd-day-event-title';
+        title.textContent = ev.title || '未命名事件';
+        el.appendChild(title);
+
+        const time = document.createElement('div');
+        time.className = 'pd-day-event-time';
+        time.textContent = `${fmtTime(ev.start)} – ${fmtTime(ev.end)}`;
+        el.appendChild(time);
+
+        [ev.location, ev.label, ev.description].forEach((detail, index) => {
+          if (!detail) return;
+          const detailEl = document.createElement('div');
+          detailEl.className = `pd-day-event-detail${index === 2 ? ' description' : ''}`;
+          detailEl.textContent = detail;
+          el.appendChild(detailEl);
+        });
+      } else {
+        el.textContent = ev.title || '未命名事件';
+      }
+
       el.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, el); });
       col.appendChild(el);
     });
@@ -321,15 +393,13 @@ const Calendar = (() => {
       col.appendChild(line);
     }
     if (isToday(d)) {
-      const now = new Date();
-      const pct = (now.getHours() * 60 + now.getMinutes());
       const nowLine = document.createElement('div');
       nowLine.className = 'pd-now-line';
-      nowLine.style.top = pct + 'px';
+      nowLine.style.top = `${new Date().getHours() * 60 + new Date().getMinutes()}px`;
       col.appendChild(nowLine);
     }
     const allEvs = Events.getInRange(startOfDay(d), endOfDay(d));
-    placeWeekEvents(allEvs.filter(ev => !ev.allDay), col);
+    placeWeekEvents(allEvs.filter(ev => !ev.allDay), col, true);
     body.appendChild(col);
     renderDayAllDay(d, allEvs);
   }
@@ -404,16 +474,17 @@ const Calendar = (() => {
 
   function render() {
     // Hide/show views
-    ['viewMonth','viewWeek','viewDay','viewAgenda'].forEach(id => {
+    ['viewYear','viewMonth','viewWeek','viewDay','viewAgenda'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.classList.add('d-none');
     });
     const active = {
-      month: 'viewMonth', week: 'viewWeek', day: 'viewDay', agenda: 'viewAgenda'
+      year: 'viewYear', month: 'viewMonth', week: 'viewWeek', day: 'viewDay', agenda: 'viewAgenda'
     }[currentView];
     if (active) document.getElementById(active)?.classList.remove('d-none');
 
-    if (currentView === 'month') renderMonth();
+    if (currentView === 'year') renderYear();
+    else if (currentView === 'month') renderMonth();
     else if (currentView === 'week') renderWeek();
     else if (currentView === 'day') renderDay();
     else if (currentView === 'agenda') renderAgenda();
@@ -422,7 +493,15 @@ const Calendar = (() => {
     if (currentView === 'week' || currentView === 'day') {
       setTimeout(() => {
         const wrap = document.querySelector('.pd-week-body-wrap');
-        if (wrap) wrap.scrollTop = 60 * 8 - 20;
+        if (!wrap) return;
+        if (currentView === 'day') {
+          const gutter = document.getElementById('dayTimeGutter');
+          const eightAm = Array.from(gutter?.children || []).slice(0, 8)
+            .reduce((height, label) => height + label.offsetHeight, 0);
+          wrap.scrollTop = eightAm - 20;
+        } else {
+          wrap.scrollTop = 60 * 8 - 20;
+        }
       }, 50);
     }
   }

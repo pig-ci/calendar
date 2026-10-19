@@ -77,6 +77,10 @@
   <!-- Secondary bar: view tabs -->
   <div class="pd-tabsbar" role="tablist" aria-label="日曆檢視模式">
     <div class="pd-tabs">
+      <button class="pd-view-btn" data-view="year" role="tab" aria-selected="false">
+        <i class="fa-regular fa-calendar-days"></i>
+        <span>年</span>
+      </button>
       <button class="pd-view-btn active" data-view="month" role="tab" aria-selected="true">
         <i class="fa-regular fa-calendar"></i>
         <span>月</span>
@@ -141,6 +145,11 @@
 
   <!-- CALENDAR VIEW -->
   <div id="calendarView">
+    <!-- Year view -->
+    <div id="viewYear" class="pd-view d-none">
+      <div class="pd-year-grid" id="yearGrid"></div>
+    </div>
+
     <!-- Month view -->
     <div id="viewMonth" class="pd-view">
       <div class="pd-month-grid-header" id="monthDayNames"></div>

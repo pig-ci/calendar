@@ -93,8 +93,11 @@
     document.querySelectorAll('.pd-view-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const view = btn.dataset.view;
-        document.querySelectorAll('.pd-view-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll(`.pd-view-btn[data-view="${view}"]`).forEach(b => b.classList.add('active'));
+        document.querySelectorAll('.pd-view-btn').forEach(b => {
+          const selected = b.dataset.view === view;
+          b.classList.toggle('active', selected);
+          b.setAttribute('aria-selected', String(selected));
+        });
         Calendar.setView(view);
         showCalendarView();
         Calendar.render();
@@ -664,7 +667,7 @@ SOFTWARE.</pre>
     }
     if (ev.location) body += `<div class="pd-popover-row"><i class="fa-solid fa-location-dot"></i><span>${escapeHTML(ev.location)}</span></div>`;
     if (ev.recurrence) body += `<div class="pd-popover-row"><i class="fa-solid fa-repeat"></i><span>${escapeHTML(Recurrence.describe(ev.recurrence))}</span></div>`;
-    if (ev.description) body += `<div class="pd-popover-row"><i class="fa-regular fa-file-lines"></i><span style="white-space:pre-wrap">${escapeHTML(ev.description.slice(0, 120))}</span></div>`;
+    if (ev.description) body += `<div class="pd-popover-row"><i class="fa-regular fa-file-lines"></i><span class="pd-popover-description">${escapeHTML(ev.description)}</span></div>`;
     if (ev.label) body += `<div class="pd-popover-row"><i class="fa-solid fa-tag"></i><span>${escapeHTML(ev.label)}</span></div>`;
     document.getElementById('popBody').innerHTML = body;
 
@@ -676,6 +679,11 @@ SOFTWARE.</pre>
       let left = rect.left;
       if (left + 300 > window.innerWidth) left = window.innerWidth - 310;
       if (top + 200 > window.innerHeight) top = rect.top - 210;
+      pop.style.top = top + 'px';
+      pop.style.left = left + 'px';
+      const popRect = pop.getBoundingClientRect();
+      top = Math.max(12, Math.min(top, window.innerHeight - popRect.height - 12));
+      left = Math.max(12, Math.min(left, window.innerWidth - popRect.width - 12));
       pop.style.top = top + 'px';
       pop.style.left = left + 'px';
     }
@@ -812,7 +820,11 @@ SOFTWARE.</pre>
             item.addEventListener('click', () => {
               Calendar.setDate(new Date(ev.start));
               Calendar.setView('day');
-              document.querySelectorAll('.pd-view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === 'day'));
+              document.querySelectorAll('.pd-view-btn').forEach(b => {
+                const selected = b.dataset.view === 'day';
+                b.classList.toggle('active', selected);
+                b.setAttribute('aria-selected', String(selected));
+              });
               showCalendarView();
               Calendar.render();
               updateNavDate();
