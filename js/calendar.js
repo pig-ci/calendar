@@ -282,7 +282,7 @@ const Calendar = (() => {
       const span = eventDaySpan(ev, ws);
       return span.startDay < span.endDay;
     }), body, ws);
-    renderWeekAllDay(ws, eventsInRange);
+    renderAllDay('weekAllDayStrip', eventsInRange, { weekStart: ws });
   }
 
   function placeWeekMultiDayEvents(events, body, ws) {
@@ -315,76 +315,69 @@ const Calendar = (() => {
     });
   }
 
-  function renderWeekAllDay(ws, eventsInRange) {
-    const strip = document.getElementById('weekAllDayStrip');
-    if (!strip) return;
-    strip.innerHTML = '';
-    const allDayEvs = eventsInRange.filter(ev => ev.allDay).map(ev => {
-      const { startDay: firstDay, endDay: lastDay } = eventDaySpan(ev, ws);
-      return {
-        event: ev,
-        startDay: Math.max(0, firstDay),
-        endDay: Math.min(6, Math.max(firstDay, lastDay)),
-        overlapsWeek: firstDay <= 6 && lastDay >= 0
-      };
-    }).filter(item => item.overlapsWeek)
-      .sort((a, b) => a.startDay - b.startDay || b.endDay - a.endDay);
-    if (allDayEvs.length === 0) return;
-
-    const gutter = document.createElement('div');
-    gutter.className = 'pd-allday-gutter';
-    gutter.textContent = '全天';
-    strip.appendChild(gutter);
-
-    const grid = document.createElement('div');
-    grid.className = 'pd-allday-grid';
-    const laneEnds = [];
-    allDayEvs.forEach(({ event, startDay, endDay }) => {
-      let lane = laneEnds.findIndex(lastDay => lastDay < startDay);
-      if (lane === -1) lane = laneEnds.length;
-      laneEnds[lane] = endDay;
-
-      const chip = document.createElement('div');
-      chip.className = 'pd-event-chip';
-      chip.style.background = Events.colorHex(event.color);
-      chip.style.gridColumn = `${startDay + 1} / ${endDay + 2}`;
-      chip.style.gridRow = String(lane + 1);
-      chip.textContent = event.title || '未命名事件';
-      chip.title = event.title || '';
-      chip.dataset.id = event._masterId || event.id;
-      chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(event._masterId || event.id, chip); });
-      grid.appendChild(chip);
-    });
-    strip.appendChild(grid);
-  }
-
-  function renderDayAllDay(d, eventsInRange) {
-    const strip = document.getElementById('dayAllDayStrip');
+  function renderAllDay(stripId, eventsInRange, { weekStart: ws = null, gutterWidth = null } = {}) {
+    const strip = document.getElementById(stripId);
     if (!strip) return;
     strip.innerHTML = '';
     const allDayEvs = eventsInRange.filter(ev => ev.allDay);
-    if (allDayEvs.length === 0) return;
+    const weekEvents = ws && allDayEvs.map(event => {
+      const { startDay, endDay } = eventDaySpan(event, ws);
+      return {
+        event,
+        startDay: Math.max(0, startDay),
+        endDay: Math.min(6, Math.max(startDay, endDay)),
+        overlapsWeek: startDay <= 6 && endDay >= 0
+      };
+    }).filter(item => item.overlapsWeek)
+      .sort((a, b) => a.startDay - b.startDay || b.endDay - a.endDay);
+    if (ws ? weekEvents.length === 0 : allDayEvs.length === 0) return;
 
     const gutter = document.createElement('div');
     gutter.className = 'pd-allday-gutter';
-    gutter.style.width = '52px';
+    if (gutterWidth) gutter.style.width = gutterWidth;
     gutter.textContent = '全天';
     strip.appendChild(gutter);
 
+    if (ws) {
+      const grid = document.createElement('div');
+      grid.className = 'pd-allday-grid';
+      const laneEnds = [];
+      weekEvents.forEach(({ event, startDay, endDay }) => {
+        let lane = laneEnds.findIndex(lastDay => lastDay < startDay);
+        if (lane === -1) lane = laneEnds.length;
+        laneEnds[lane] = endDay;
+
+        const chip = createAllDayChip(event);
+        chip.style.gridColumn = `${startDay + 1} / ${endDay + 2}`;
+        chip.style.gridRow = String(lane + 1);
+        grid.appendChild(chip);
+      });
+      strip.appendChild(grid);
+      return;
+    }
+
     const col = document.createElement('div');
     col.className = 'pd-allday-col';
-    allDayEvs.forEach(ev => {
-      const chip = document.createElement('div');
-      chip.className = 'pd-event-chip';
-      chip.style.background = Events.colorHex(ev.color);
+    allDayEvs.forEach(event => {
+      const chip = createAllDayChip(event);
       chip.style.marginBottom = '2px';
-      chip.textContent = ev.title || '未命名事件';
-      chip.title = ev.title || '';
-      chip.dataset.id = ev._masterId || ev.id;
-      chip.addEventListener('click', e2 => { e2.stopPropagation(); onEventClick(ev._masterId || ev.id, chip); });
       col.appendChild(chip);
     });
     strip.appendChild(col);
+  }
+
+  function createAllDayChip(event) {
+    const chip = document.createElement('div');
+    chip.className = 'pd-event-chip';
+    chip.style.background = Events.colorHex(event.color);
+    chip.textContent = event.title || '未命名事件';
+    chip.title = event.title || '';
+    chip.dataset.id = event._masterId || event.id;
+    chip.addEventListener('click', e => {
+      e.stopPropagation();
+      onEventClick(event._masterId || event.id, chip);
+    });
+    return chip;
   }
 
   function placeWeekEvents(evs, col, showDetails = false, visibleDay = null) {
@@ -472,7 +465,7 @@ const Calendar = (() => {
     const allEvs = Events.getInRange(startOfDay(d), endOfDay(d));
     placeWeekEvents(allEvs.filter(ev => !ev.allDay), col, true, d);
     body.appendChild(col);
-    renderDayAllDay(d, allEvs);
+    renderAllDay('dayAllDayStrip', allEvs, { gutterWidth: '52px' });
   }
 
   /* ---- 議程檢視 ---- */

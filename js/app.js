@@ -154,9 +154,7 @@
     document.getElementById('calendarView').classList.add('d-none');
     const pv = document.getElementById('pageView');
     pv.classList.remove('d-none');
-    if (name === 'settings') pv.innerHTML = renderSettingsPage();
-    else if (name === 'about') pv.innerHTML = renderAboutPage();
-    else if (name === 'license') pv.innerHTML = renderLicensePage();
+    pv.innerHTML = renderSettingsPage();
     setActivePageLink(name);
     initPageActions(name);
   }
@@ -304,73 +302,6 @@
         alert('所有事件已刪除。');
       });
     }
-  }
-
-  /* ========================= 關於頁面 ========================= */
-  function renderAboutPage() {
-    return `
-    <div class="pd-page">
-      <h2 style="font-family:'Fraunces',serif;color:var(--accent)"><i class="fa-regular fa-calendar-days me-2"></i>Payas Days</h2>
-      <p style="color:var(--text-3);font-size:12px;font-family:'JetBrains Mono',monospace">v1.0.0 · 日曆</p>
-      <p>Payas Days 是一款響應式、重視隱私的網頁日曆，完全在瀏覽器中執行，不需要伺服器。事件會使用 IndexedDB 儲存在本機，並可匯出為 Markdown 或標準 ICS 格式。</p>
-      <hr/>
-      <h3>功能</h3>
-      <ul>
-        <li>月、週、日與議程檢視</li>
-        <li>支援 iCalendar RRULE 的重複事件</li>
-        <li>深色與淺色主題，並可偵測系統偏好</li>
-        <li>ICS 匯入與匯出（相容 Google 日曆、Outlook）</li>
-        <li>匯出 Markdown 檔案，方便攜帶與保存</li>
-        <li>透過瀏覽器通知接收事件提醒</li>
-        <li>無須帳號；事件資料儲存於本機</li>
-      </ul>
-      <hr/>
-      <h3>開發者</h3>
-      <p>
-        <strong>Saman Wijesinghe</strong><br/>
-        <span style="color:var(--pd-text-muted)">全端開發者暨開源軟體愛好者</span>
-      </p>
-      <hr/>
-      <h3>技術</h3>
-      <ul>
-        <li>原生 JavaScript（ES2022）</li>
-        <li>Bootstrap 5.3 · Font Awesome 6.5</li>
-        <li>使用 IndexedDB 儲存本機資料</li>
-        <li>使用 Markdown 與 YAML front matter 序列化事件</li>
-        <li>使用 iCalendar（RFC 5545）匯入／匯出 ICS</li>
-      </ul>
-    </div>`;
-  }
-
-  /* ========================= 授權頁面 ========================= */
-  function renderLicensePage() {
-    return `
-    <div class="pd-page">
-      <h2><i class="fa-solid fa-file-lines me-2"></i>授權條款</h2>
-      <p style="color:var(--pd-text-muted);font-size:12px;">MIT License（英文原文）</p>
-      <hr/>
-      <pre style="white-space:pre-wrap;font-size:13px;color:var(--pd-text-secondary);line-height:1.7">MIT License
-
-Copyright (c) 2026 Saman Wijesinghe
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</pre>
-    </div>`;
   }
 
   /* ========================= 快速新增按鈕 ========================= */
