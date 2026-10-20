@@ -69,7 +69,10 @@ const Recurrence = (() => {
     return d;
   }
 
-  function isoDate(d) { return d.toISOString().slice(0, 10); }
+  function isoDate(d) {
+    const pad = value => String(value).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  }
 
   /**
    * 將重複事件展開為 [rangeStart, rangeEnd] 範圍內的各次事件。

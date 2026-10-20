@@ -477,7 +477,7 @@ const Calendar = (() => {
     if (!list) return;
 
     const rangeStart = startOfDay(currentDate);
-    const rangeEnd = new Date(rangeStart); rangeEnd.setDate(rangeEnd.getDate() + 30);
+    const rangeEnd = new Date(rangeStart); rangeEnd.setDate(rangeEnd.getDate() + 29);
     const evs = Events.getInRange(rangeStart, rangeEnd)
       .sort((a, b) => new Date(a.start) - new Date(b.start));
 
