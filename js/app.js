@@ -116,8 +116,6 @@
         });
         Calendar.setView(view);
         showCalendarView();
-        Calendar.render();
-        updateNavDate();
       });
     });
   }
@@ -127,6 +125,8 @@
     document.getElementById('pageView').classList.add('d-none');
     document.getElementById('pageView').innerHTML = '';
     setActivePageLink(null);
+    Calendar.render();
+    updateNavDate();
   }
 
   /* ========================= 頁面導覽連結 ========================= */
@@ -591,9 +591,21 @@
     if (!container) return;
     const chip = document.createElement('span');
     chip.className = 'pd-tag-chip';
-    chip.innerHTML = `${value}${suffix ? ' <em>' + suffix + '</em>' : ''} <span class="remove-tag" title="移除">&times;</span>`;
+    chip.appendChild(document.createTextNode(String(value)));
+    if (suffix) {
+      chip.appendChild(document.createTextNode(' '));
+      const suffixElement = document.createElement('em');
+      suffixElement.textContent = String(suffix);
+      chip.appendChild(suffixElement);
+    }
+    chip.appendChild(document.createTextNode(' '));
+    const removeButton = document.createElement('span');
+    removeButton.className = 'remove-tag';
+    removeButton.title = '移除';
+    removeButton.textContent = '\u00d7';
+    chip.appendChild(removeButton);
     chip.dataset.value = value;
-    chip.querySelector('.remove-tag').addEventListener('click', () => chip.remove());
+    removeButton.addEventListener('click', () => chip.remove());
     container.appendChild(chip);
   }
 
@@ -803,8 +815,6 @@
                 b.setAttribute('aria-selected', String(selected));
               });
               showCalendarView();
-              Calendar.render();
-              updateNavDate();
               closeSearch();
               setTimeout(() => showEventPopover(ev.id, document.querySelector(`[data-id="${ev.id}"]`)), 200);
             });

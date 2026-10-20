@@ -32,6 +32,12 @@ const Events = (() => {
   async function remove(id) {
     await Storage.deleteEvent(id);
     cache = cache.filter(e => e.id !== id);
+    const eventId = String(id);
+    for (const key of Object.keys(scheduledTimers)) {
+      if (key.slice(0, key.lastIndexOf('_')) !== eventId) continue;
+      clearTimeout(scheduledTimers[key]);
+      delete scheduledTimers[key];
+    }
   }
 
   function getAll() { return cache; }
