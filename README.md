@@ -10,6 +10,7 @@ Payas Days 是一款以瀏覽器執行的個人日曆。無須帳號、建置流
 - **提醒與衝突提示**：設定事件開始前的提醒時間，儲存時檢查行程是否重疊。
 - **搜尋**：依事件標題、描述、地點或標籤搜尋。
 - **資料匯入／匯出**：支援 ICS 與 Markdown 格式。
+- **儲存狀態提示**：儲存時顯示 spinner 並阻止重複提交；出錯時顯示自訂提示。
 - **個人化介面**：支援淺色與深色主題，並適用於桌面和行動裝置。
 
 ## 開始使用
@@ -50,6 +51,14 @@ js/ics.js                  ICS 匯入與匯出
 js/storage.js              IndexedDB 與 Markdown 資料處理
 ```
 
+## 開發與維護
+
+- JavaScript 以 classic script 依序載入：`storage.js`、`recurrence.js`、`ics.js`、`events.js`、`calendar.js`、`app.js`；不使用建置工具或套件安裝流程。
+- 每個腳本啟用 `'use strict'`，並在檔案開頭註明函式用途及函式依賴，方便追蹤模組邊界。
+- 應用程式初始化失敗會以 `console.warn` 記錄；固定 DOM 事件目標不存在時會略過該事件綁定。
+- 使用自訂對話框顯示提示與確認；儲存按鈕會在儲存期間停用，並於所有結束路徑恢復狀態。
+- 行動版選單由共用的 `closeMobileMenu()` 關閉，避免不同入口造成狀態不一致。
+
 ## 文件與授權
 
-更完整的操作說明、資料格式及程式模組參考，請閱讀[使用與開發文件](payas-days-docs.md)。本專案採用 MIT License，詳見 [LICENSE](LICENSE)。
+此 README 包含目前的快速開始、操作提示、資料儲存及專案結構；舊版獨立使用與開發文件已移除。本專案採用 MIT License，詳見 [LICENSE](LICENSE)。
