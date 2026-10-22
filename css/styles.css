@@ -299,7 +299,7 @@ body {
   font-weight: 500;
   color: var(--text-3);
   cursor: pointer;
-  transition: all var(--pd-transition);
+  transition: background var(--pd-transition), color var(--pd-transition), border-color var(--pd-transition);
   white-space: nowrap;
 }
 .pd-today-pill:hover { background: var(--bg-hover); color: var(--text-1); border-color: var(--text-3); }
@@ -524,6 +524,8 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   background: var(--bg-surface);
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
 }
 .pd-year-month-title {
   margin: 0 0 8px;
@@ -735,7 +737,7 @@ body {
   font-weight: 400;
 }
 .pd-week-body { flex: 1; display: flex; position: relative; min-height: 1440px; }
-.pd-day-column { flex: 1; border-right: 1px solid var(--border); position: relative; min-height: 1440px; }
+.pd-day-column { flex: 1; border-right: 1px solid var(--border); position: relative; min-height: 1440px; contain: layout style; }
 .pd-day-column:last-child { border-right: none; }
 .pd-time-line { height: 60px; border-bottom: 1px solid var(--border); position: relative; }
 .pd-time-line:nth-child(even) { background: rgba(0,0,0,.012); }
@@ -1127,7 +1129,7 @@ body {
   border-radius: 50%;
   cursor: pointer;
   border: 2px solid transparent;
-  transition: all var(--pd-transition);
+  transition: border-color var(--pd-transition), transform var(--pd-transition);
 }
 .pd-color-swatch:hover, .pd-color-swatch.active {
   border-color: var(--text-1);
@@ -1254,7 +1256,7 @@ body {
   text-align: center;
   color: var(--text-3);
   cursor: pointer;
-  transition: all var(--pd-transition);
+  transition: border-color var(--pd-transition), background var(--pd-transition), color var(--pd-transition);
   font-size: 13px;
 }
 .pd-import-area:hover, .pd-import-area.drag-over {
@@ -1317,7 +1319,6 @@ body {
    捲軸
 ══════════════════════════════════════ */
 ::-webkit-scrollbar { width: 5px; height: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
 * { scrollbar-width: thin; scrollbar-color: var(--scrollbar) transparent; }
@@ -1327,11 +1328,6 @@ body {
 }
 .pd-year-grid::-webkit-scrollbar,
 .pd-week-body-wrap::-webkit-scrollbar { width: 9px; }
-.pd-year-grid::-webkit-scrollbar-track,
-.pd-week-body-wrap::-webkit-scrollbar-track {
-  background: var(--bg-sidebar);
-  border-radius: 8px;
-}
 .pd-year-grid::-webkit-scrollbar-thumb,
 .pd-week-body-wrap::-webkit-scrollbar-thumb {
   background: var(--scrollbar);
