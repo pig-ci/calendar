@@ -312,7 +312,10 @@
           <button type="button" class="btn pd-btn-danger d-none" id="btnDeleteEvent" title="按住 Shift 點擊可直接刪除"><i class="fa-solid fa-trash me-1"></i>刪除</button>
         </div>
         <button type="button" class="btn pd-btn-ghost" data-bs-dismiss="modal">取消</button>
-        <button type="button" class="btn pd-btn-primary" id="btnSaveEvent"><i class="fa-solid fa-floppy-disk me-1"></i>儲存</button>
+        <button type="button" class="btn pd-btn-primary" id="btnSaveEvent" aria-busy="false">
+          <span class="spinner-border spinner-border-sm me-1 d-none" aria-hidden="true"></span>
+          <i class="fa-solid fa-floppy-disk me-1"></i>儲存
+        </button>
       </div>
     </div>
   </div>
@@ -340,6 +343,17 @@
     <div class="pd-delete-confirm-actions">
       <button type="button" class="btn pd-btn-ghost" id="cancelDeleteEvent">取消</button>
       <button type="button" class="btn pd-btn-danger" id="confirmDeleteEvent"><i class="fa-solid fa-trash me-1"></i>刪除</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 一般提示 -->
+<dialog class="pd-delete-dialog" id="appAlert" aria-labelledby="appAlertTitle" aria-describedby="appAlertMessage">
+  <div class="pd-delete-confirm-content">
+    <h2 id="appAlertTitle">提示</h2>
+    <p id="appAlertMessage"></p>
+    <div class="pd-delete-confirm-actions">
+      <button type="button" class="btn pd-btn-primary" id="dismissAppAlert">知道了</button>
     </div>
   </div>
 </dialog>
