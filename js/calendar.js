@@ -23,6 +23,7 @@
  * render：切換並執行目前檢視的渲染；依賴 renderYear、renderMonth、renderWeek、renderDay、renderAgenda。
  */
 const Calendar = (() => {
+  const $ = id => document.getElementById(id);
   const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
   const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const VALID_VIEWS = new Set(['year', 'month', 'week', 'day', 'agenda']);
@@ -118,8 +119,8 @@ const Calendar = (() => {
 
   /* ---- 月檢視 ---- */
   function renderMonth() {
-    const grid = document.getElementById('monthGrid');
-    const header = document.getElementById('monthDayNames');
+    const grid = $('monthGrid');
+    const header = $('monthDayNames');
     if (!grid || !header) return;
 
     header.innerHTML = DAYS.map(d => `<div>${d}</div>`).join('');
@@ -202,7 +203,7 @@ const Calendar = (() => {
 
   /* ---- 年檢視 ---- */
   function renderYear() {
-    const grid = document.getElementById('yearGrid');
+    const grid = $('yearGrid');
     if (!grid) return;
 
     const year = currentDate.getFullYear();
@@ -250,9 +251,9 @@ const Calendar = (() => {
 
   /* ---- 週檢視 ---- */
   function renderWeek() {
-    const headerEl = document.getElementById('weekHeader');
-    const body = document.getElementById('weekBody');
-    const gutter = document.getElementById('timeGutter');
+    const headerEl = $('weekHeader');
+    const body = $('weekBody');
+    const gutter = $('timeGutter');
     if (!headerEl || !body || !gutter) return;
 
     const ws = weekStart(currentDate);
@@ -346,7 +347,7 @@ const Calendar = (() => {
   }
 
   function renderAllDay(stripId, eventsInRange, { weekStart: ws = null, gutterWidth = null } = {}) {
-    const strip = document.getElementById(stripId);
+    const strip = $(stripId);
     if (!strip) return;
     strip.innerHTML = '';
     const allDayEvs = eventsInRange.filter(ev => ev.allDay);
@@ -462,9 +463,9 @@ const Calendar = (() => {
 
   /* ---- 日檢視 ---- */
   function renderDay() {
-    const headerEl = document.getElementById('dayHeader');
-    const body = document.getElementById('dayBody');
-    const gutter = document.getElementById('dayTimeGutter');
+    const headerEl = $('dayHeader');
+    const body = $('dayBody');
+    const gutter = $('dayTimeGutter');
     if (!headerEl || !body || !gutter) return;
 
     const d = new Date(currentDate);
@@ -500,7 +501,7 @@ const Calendar = (() => {
 
   /* ---- 議程檢視 ---- */
   function renderAgenda() {
-    const list = document.getElementById('agendaList');
+    const list = $('agendaList');
     if (!list) return;
 
     const rangeStart = startOfDay(currentDate);
@@ -569,13 +570,13 @@ const Calendar = (() => {
   function render() {
     // 隱藏／顯示檢視
     ['viewYear','viewMonth','viewWeek','viewDay','viewAgenda'].forEach(id => {
-      const el = document.getElementById(id);
+      const el = $(id);
       if (el) el.classList.add('d-none');
     });
     const active = {
       year: 'viewYear', month: 'viewMonth', week: 'viewWeek', day: 'viewDay', agenda: 'viewAgenda'
     }[currentView];
-    if (active) document.getElementById(active)?.classList.remove('d-none');
+    if (active) $(active)?.classList.remove('d-none');
 
     if (currentView === 'year') renderYear();
     else if (currentView === 'month') renderMonth();
@@ -590,7 +591,7 @@ const Calendar = (() => {
         const wrap = document.querySelector(`#${viewId} .pd-week-body-wrap`);
         if (!wrap) return;
         if (currentView === 'day') {
-          const gutter = document.getElementById('dayTimeGutter');
+          const gutter = $('dayTimeGutter');
           const eightAm = Array.from(gutter?.children || []).slice(0, 8)
             .reduce((height, label) => height + label.offsetHeight, 0);
           wrap.scrollTop = eightAm - 20;

@@ -66,8 +66,9 @@
  * pad：補齊日期時間欄位數字；由 toLocalISO 呼叫；無內部函式依賴。
  * downloadText：建立文字下載；無內部函式依賴。
  */
+const $ = id => document.getElementById(id);
+
 (async () => {
-  const $ = id => document.getElementById(id);
   const val = id => $(id).value;
   const UNTITLED_EVENT_TITLE = '未命名事件';
 
@@ -137,7 +138,7 @@
 
   /* ========================= 導覽控制項 ========================= */
   function updateNavDate() {
-    const el = document.getElementById('navDateDisplay');
+    const el = $('navDateDisplay');
     if (el) el.textContent = Calendar.titleLabel();
   }
   function renderCalendarAndSyncNav(updateCalendar) {
@@ -155,8 +156,8 @@
   }
 
   function openMobileMenu() {
-    const mobileMenu = document.getElementById('pdMobileMenu');
-    const menuBtn = document.getElementById('btnMobileMenu');
+    const mobileMenu = $('pdMobileMenu');
+    const menuBtn = $('btnMobileMenu');
     mobileMenu?.classList.add('open');
     menuBtn?.classList.add('open');
     mobileMenu?.setAttribute('aria-hidden', 'false');
@@ -164,8 +165,8 @@
   }
 
   function closeMobileMenu() {
-    const mobileMenu = document.getElementById('pdMobileMenu');
-    const menuBtn = document.getElementById('btnMobileMenu');
+    const mobileMenu = $('pdMobileMenu');
+    const menuBtn = $('btnMobileMenu');
     mobileMenu?.classList.remove('open');
     menuBtn?.classList.remove('open');
     mobileMenu?.setAttribute('aria-hidden', 'true');
@@ -173,7 +174,7 @@
   }
 
   function toggleMobileMenu() {
-    const mobileMenu = document.getElementById('pdMobileMenu');
+    const mobileMenu = $('pdMobileMenu');
     if (!mobileMenu) return;
     if (mobileMenu.classList.contains('open')) closeMobileMenu();
     else openMobileMenu();
@@ -187,8 +188,8 @@
     $('brandHomeLink')?.addEventListener('click', e => { e.preventDefault(); showCalendarView(); });
 
     // 切換行動版選單
-    const menuBtn = document.getElementById('btnMobileMenu');
-    const mobileMenu = document.getElementById('pdMobileMenu');
+    const menuBtn = $('btnMobileMenu');
+    const mobileMenu = $('pdMobileMenu');
     menuBtn?.addEventListener('click', toggleMobileMenu);
     // 點擊選單外部時關閉行動版選單
     document.addEventListener('click', e => {
@@ -227,9 +228,9 @@
   }
 
   function showCalendarView() {
-    document.getElementById('calendarView').classList.remove('d-none');
-    document.getElementById('pageView').classList.add('d-none');
-    document.getElementById('pageView').innerHTML = '';
+    $('calendarView').classList.remove('d-none');
+    $('pageView').classList.add('d-none');
+    $('pageView').innerHTML = '';
     setActivePageLink(null);
     renderCalendarAndSyncNav();
   }
@@ -254,8 +255,8 @@
   }
 
   function showPage(name) {
-    document.getElementById('calendarView').classList.add('d-none');
-    const pv = document.getElementById('pageView');
+    $('calendarView').classList.add('d-none');
+    const pv = $('pageView');
     pv.classList.remove('d-none');
     pv.innerHTML = renderSettingsPage();
     setActivePageLink(name);
@@ -326,7 +327,7 @@
   function initPageActions(name) {
     if (name === 'settings') {
       // 主題設定
-      const themeEl = document.getElementById('settingTheme');
+      const themeEl = $('settingTheme');
       if (themeEl) {
         themeEl.value = document.documentElement.getAttribute('data-theme') || 'light';
         themeEl.addEventListener('change', async () => {
@@ -334,7 +335,7 @@
           await Storage.setSetting('theme', themeEl.value);
         });
       }
-      const timeFormatEl = document.getElementById('setting24HourTime');
+      const timeFormatEl = $('setting24HourTime');
       if (timeFormatEl) {
         timeFormatEl.addEventListener('change', async () => {
           await Storage.setSetting('alwaysUse24HourTime', timeFormatEl.checked);
@@ -344,7 +345,7 @@
         });
       }
       // 通知
-      const notifBtn = document.getElementById('btnRequestNotif');
+      const notifBtn = $('btnRequestNotif');
       if (notifBtn && 'Notification' in window) {
         const updateNotifBtn = perm => {
           if (perm === 'granted') {
@@ -398,7 +399,7 @@
       });
       // 拖放匯入
       ['importICSLabel','importMDLabel'].forEach(id => {
-        const el = document.getElementById(id);
+        const el = $(id);
         if (!el) return;
         el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
         el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
@@ -429,7 +430,7 @@
 
   /* ========================= 顏色選擇器 ========================= */
   function initColorPicker() {
-    const picker = document.getElementById('colorPicker');
+    const picker = $('colorPicker');
     if (!picker) return;
     const colorLabels = {
       blue: '藍色', teal: '藍綠色', green: '綠色', yellow: '黃色', orange: '橘色',
@@ -462,7 +463,7 @@
 
   /* ========================= 時區 ========================= */
   function initTimezones() {
-    const sel = document.getElementById('evTimezone');
+    const sel = $('evTimezone');
     if (!sel) return;
     const zones = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [
       'UTC','America/New_York','America/Los_Angeles','America/Chicago','Europe/London',
@@ -484,7 +485,7 @@
   let activeAppDialog = null;
 
   function eventModalInstance() {
-    return bootstrap.Modal.getOrCreateInstance(document.getElementById('eventModal'));
+    return bootstrap.Modal.getOrCreateInstance($('eventModal'));
   }
 
   function showEventModal() {
@@ -497,9 +498,9 @@
 
   function openNewEventModal(date) {
     editingEventId = null;
-    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-calendar-plus me-2"></i>新增事件';
-    document.getElementById('btnDeleteEvent').classList.add('d-none');
-    document.getElementById('btnExportEvent').classList.add('d-none');
+    $('eventModalLabel').innerHTML = '<i class="fa-solid fa-calendar-plus me-2"></i>新增事件';
+    $('btnDeleteEvent').classList.add('d-none');
+    $('btnExportEvent').classList.add('d-none');
     resetForm();
 
     // 預先填入日期
@@ -519,9 +520,9 @@
     const ev = Events.getById(id);
     if (!ev) return;
     editingEventId = id;
-    document.getElementById('eventModalLabel').innerHTML = '<i class="fa-solid fa-pen me-2"></i>編輯事件';
-    document.getElementById('btnDeleteEvent').classList.remove('d-none');
-    document.getElementById('btnExportEvent').classList.remove('d-none');
+    $('eventModalLabel').innerHTML = '<i class="fa-solid fa-pen me-2"></i>編輯事件';
+    $('btnDeleteEvent').classList.remove('d-none');
+    $('btnExportEvent').classList.remove('d-none');
 
     $('evTitle').value = ev.title || '';
     $('evType').value = ev.type || '';
@@ -530,7 +531,7 @@
     $('evLabel').value = ev.label || '';
 
     const allDay = ev.allDay || false;
-    document.getElementById('evAllDay').checked = allDay;
+    $('evAllDay').checked = allDay;
     toggleAllDay(allDay);
 
     if (allDay) {
@@ -542,13 +543,13 @@
     }
     updateEventEndMin();
 
-    const tz = document.getElementById('evTimezone');
+    const tz = $('evTimezone');
     if (tz && ev.timezone) tz.value = ev.timezone;
 
     setSelectedColor(ev.color || 'blue');
 
-    const recSel = document.getElementById('evRecurrence');
-    const rruleInput = document.getElementById('evRrule');
+    const recSel = $('evRecurrence');
+    const rruleInput = $('evRrule');
     const knownRules = Array.from(recSel.options).map(o => o.value);
     if (ev.recurrence && !knownRules.includes(ev.recurrence)) {
       recSel.value = 'custom';
@@ -570,7 +571,7 @@
     $('evAllDay')?.addEventListener('change', e => toggleAllDay(e.target.checked));
     $('evStart')?.addEventListener('input', updateEventEndMin);
     $('evRecurrence')?.addEventListener('change', e => {
-      document.getElementById('evRrule').classList.toggle('d-none', e.target.value !== 'custom');
+      $('evRrule').classList.toggle('d-none', e.target.value !== 'custom');
     });
 
     $('btnAddReminder')?.addEventListener('click', () => {
@@ -609,27 +610,27 @@
   }
 
   function toggleAllDay(isAllDay) {
-    document.getElementById('startDateWrap').style.display = isAllDay ? 'none' : '';
-    document.getElementById('endDateWrap').style.display = isAllDay ? 'none' : '';
-    document.getElementById('startDateOnlyWrap').style.display = isAllDay ? '' : 'none';
-    document.getElementById('endDateOnlyWrap').style.display = isAllDay ? '' : 'none';
+    $('startDateWrap').style.display = isAllDay ? 'none' : '';
+    $('endDateWrap').style.display = isAllDay ? 'none' : '';
+    $('startDateOnlyWrap').style.display = isAllDay ? '' : 'none';
+    $('endDateOnlyWrap').style.display = isAllDay ? '' : 'none';
   }
 
   function updateEventEndMin() {
     const start = val('evStart');
-    const endInput = document.getElementById('evEnd');
+    const endInput = $('evEnd');
     endInput.min = start ? toLocalISO(new Date(new Date(start).getTime() + 15 * 60000)) : '';
   }
 
   function resetForm() {
-    document.getElementById('eventForm').reset();
-    document.getElementById('evRrule').classList.add('d-none');
+    $('eventForm').reset();
+    $('evRrule').classList.add('d-none');
     toggleAllDay(false);
-    document.getElementById('reminderList').innerHTML = '';
-    document.getElementById('attendeeList').innerHTML = '';
-    document.getElementById('attachmentList').innerHTML = '';
+    $('reminderList').innerHTML = '';
+    $('attendeeList').innerHTML = '';
+    $('attachmentList').innerHTML = '';
     setSelectedColor('blue');
-    const tz = document.getElementById('evTimezone');
+    const tz = $('evTimezone');
     if (tz) tz.value = getUserTimezone();
   }
 
@@ -637,7 +638,7 @@
     if (isSavingEvent) return;
     isSavingEvent = true;
 
-    const saveButton = document.getElementById('btnSaveEvent');
+    const saveButton = $('btnSaveEvent');
     const spinner = saveButton?.querySelector('.spinner-border');
     const icon = saveButton?.querySelector('.fa-floppy-disk');
     if (saveButton) {
@@ -667,15 +668,15 @@
 
   async function saveEventData() {
     const title = val('evTitle').trim();
-    if (!title) { document.getElementById('evTitle').focus(); return; }
+    if (!title) { $('evTitle').focus(); return; }
     const type = val('evType');
     if (!type) {
       await showAppAlert('請選擇事件類型（重要或細流）。');
-      document.getElementById('evType').focus();
+      $('evType').focus();
       return;
     }
 
-    const allDay = document.getElementById('evAllDay').checked;
+    const allDay = $('evAllDay').checked;
     let start, end;
     if (allDay) {
       const startDateVal = val('evStartDate');
@@ -740,7 +741,7 @@
 
   /* ========================= 標籤清單 ========================= */
   function addTagToList(containerId, value, suffix) {
-    const container = document.getElementById(containerId);
+    const container = $(containerId);
     if (!container) return;
     const chip = document.createElement('span');
     chip.className = 'pd-tag-chip';
@@ -763,7 +764,7 @@
   }
 
   function renderTagList(containerId, values, suffix) {
-    const container = document.getElementById(containerId);
+    const container = $(containerId);
     if (!container) return;
     container.innerHTML = '';
     values.forEach(v => addTagToList(containerId, v, suffix));
@@ -777,16 +778,16 @@
   function initPopover() {
     $('popClose')?.addEventListener('click', closePopover);
     $('popEdit')?.addEventListener('click', () => {
-      const id = document.getElementById('eventPopover').dataset.eventId;
+      const id = $('eventPopover').dataset.eventId;
       closePopover();
       openEditModal(id);
     });
     $('popDelete')?.addEventListener('click', async event => {
-      const id = document.getElementById('eventPopover').dataset.eventId;
+      const id = $('eventPopover').dataset.eventId;
       await requestEventDelete(id, event.shiftKey);
     });
     document.addEventListener('click', e => {
-      const pop = document.getElementById('eventPopover');
+      const pop = $('eventPopover');
       if (!pop.classList.contains('d-none') && !pop.contains(e.target)) closePopover();
     });
   }
@@ -795,10 +796,10 @@
     const ev = Events.getById(id);
     if (!ev) return;
 
-    const pop = document.getElementById('eventPopover');
+    const pop = $('eventPopover');
     pop.dataset.eventId = id;
-    document.getElementById('popColor').style.background = Events.colorHex(ev.color);
-    document.getElementById('popTitle').textContent = ev.title || UNTITLED_EVENT_TITLE;
+    $('popColor').style.background = Events.colorHex(ev.color);
+    $('popTitle').textContent = ev.title || UNTITLED_EVENT_TITLE;
 
     let body = '';
     const s = new Date(ev.start);
@@ -811,7 +812,7 @@
     if (ev.recurrence) body += `<div class="pd-popover-row"><i class="fa-solid fa-repeat"></i><span>${escapeHTML(Recurrence.describe(ev.recurrence))}</span></div>`;
     if (ev.description) body += `<div class="pd-popover-row"><i class="fa-regular fa-file-lines"></i><span class="pd-popover-description">${escapeHTML(ev.description)}</span></div>`;
     if (ev.label) body += `<div class="pd-popover-row"><i class="fa-solid fa-tag"></i><span>${escapeHTML(ev.label)}</span></div>`;
-    document.getElementById('popBody').innerHTML = body;
+    $('popBody').innerHTML = body;
 
     // 定位於錨點附近
     pop.classList.remove('d-none');
@@ -832,11 +833,11 @@
   }
 
   function closePopover() {
-    document.getElementById('eventPopover').classList.add('d-none');
+    $('eventPopover').classList.add('d-none');
   }
 
   function initDeleteConfirmation() {
-    const dialog = document.getElementById('deleteConfirm');
+    const dialog = $('deleteConfirm');
     $('cancelDeleteEvent')?.addEventListener('click', closeDeleteConfirmation);
     $('confirmDeleteEvent')?.addEventListener('click', async () => {
       const id = pendingDeleteEventId;
@@ -908,13 +909,13 @@
       return;
     }
     pendingDeleteEventId = id;
-    const dialog = document.getElementById('deleteConfirm');
+    const dialog = $('deleteConfirm');
     dialog.showModal();
-    document.getElementById('confirmDeleteEvent').focus();
+    $('confirmDeleteEvent').focus();
   }
 
   function closeDeleteConfirmation() {
-    const dialog = document.getElementById('deleteConfirm');
+    const dialog = $('deleteConfirm');
     if (!dialog.open || dialog.classList.contains('is-closing')) return;
     dialog.classList.add('is-closing');
     const finishClosing = event => {
@@ -927,7 +928,7 @@
   }
 
   function finishDeleteConfirmation() {
-    const dialog = document.getElementById('deleteConfirm');
+    const dialog = $('deleteConfirm');
     if (dialog.open) dialog.close();
     else pendingDeleteEventId = null;
   }
@@ -938,7 +939,7 @@
       hideEventModal();
       editingEventId = null;
     }
-    if (document.getElementById('eventPopover').dataset.eventId === id) closePopover();
+    if ($('eventPopover').dataset.eventId === id) closePopover();
     Calendar.render();
   }
 
@@ -1045,8 +1046,8 @@
 
 })().catch(error => {
   console.warn('Payas Days 初始化失敗：', error);
-  const dialog = document.getElementById('startupErrorDialog');
-  const reloadButton = document.getElementById('reloadAppButton');
+  const dialog = $('startupErrorDialog');
+  const reloadButton = $('reloadAppButton');
   reloadButton?.addEventListener('click', () => window.location.reload(), { once: true });
   if (dialog && !dialog.open) {
     if (typeof dialog.showModal === 'function') dialog.showModal();
