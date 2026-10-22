@@ -1,4 +1,55 @@
-/* Payas Days — 主應用程式 */
+'use strict';
+
+/*
+ * 主應用與畫面互動。
+ * 初始化 IIFE：載入 Storage、Events、Calendar，並呼叫各 init 函式完成啟動。
+ * loadTheme：讀取主題設定；依賴 Storage.getSetting、applyTheme。
+ * applyTheme：套用主題與圖示；無內部函式依賴。
+ * updateNavDate：更新導覽日期；依賴 Calendar.titleLabel。
+ * closeMobileMenu：關閉行動選單並更新 aria 狀態；無內部函式依賴。
+ * initNavControls：綁定日期、鍵盤與行動選單控制；依賴 Calendar、updateNavDate、closeMobileMenu、showCalendarView。
+ * initViewButtons：綁定檢視切換；依賴 Calendar.setView、showCalendarView。
+ * showCalendarView：切回日曆並重繪；依賴 setActivePageLink、Calendar.render、updateNavDate。
+ * initNavLinks：綁定頁面導覽；依賴 showPage、closeMobileMenu。
+ * setActivePageLink：更新頁面連結選取狀態；無內部函式依賴。
+ * showPage：顯示設定頁；依賴 renderSettingsPage、setActivePageLink、initPageActions。
+ * renderSettingsPage：產生設定頁 HTML；無內部函式依賴。
+ * initPageActions：綁定設定、匯入／匯出與清除操作；依賴 applyTheme、showAppAlert、downloadText、Storage、Events、ICS、Calendar、updateNotifBtn。
+ * updateNotifBtn：更新通知權限按鈕文字與狀態；由 initPageActions 建立及呼叫；無內部函式依賴。
+ * initFab：綁定快速新增按鈕；依賴 openNewEventModal。
+ * initColorPicker：建立顏色選項；依賴 Events.EVENT_COLORS。
+ * getSelectedColor：讀取目前選取顏色；無內部函式依賴。
+ * setSelectedColor：設定目前選取顏色；無內部函式依賴。
+ * initTimezones：填入時區選項；無內部函式依賴。
+ * openNewEventModal：準備並開啟新增事件視窗；依賴 resetForm、toLocalISO、updateEventEndMin。
+ * openEditModal：載入事件並開啟編輯視窗；依賴 Events.getById、toggleAllDay、toLocalISO、updateEventEndMin、setSelectedColor、renderTagList。
+ * initEventForm：綁定事件表單操作；依賴 toggleAllDay、updateEventEndMin、addTagToList、saveEventFromForm、requestEventDelete、downloadText、Events.getById、Storage.eventToMarkdown。
+ * toggleAllDay：切換全天欄位；無內部函式依賴。
+ * updateEventEndMin：更新結束時間下限；依賴 toLocalISO。
+ * resetForm：重設事件表單；依賴 toggleAllDay、setSelectedColor。
+ * saveEventFromForm：防止重複提交並管理儲存狀態；依賴 saveEventData、showAppAlert。
+ * saveEventData：驗證並儲存事件；依賴 showAppAlert、getSelectedColor、getTagValues、Events.detectConflicts、Events.save、Calendar.render。
+ * addTagToList：新增標籤項目；無內部函式依賴。
+ * renderTagList：重建標籤清單；依賴 addTagToList。
+ * getTagValues：讀取標籤值；無內部函式依賴。
+ * initPopover：綁定事件快顯視窗操作；依賴 closePopover、openEditModal、requestEventDelete。
+ * showEventPopover：填入並定位事件快顯視窗；依賴 Events.getById、Events.colorHex、Calendar.fmtTime、Recurrence.describe、escapeHTML。
+ * closePopover：隱藏事件快顯視窗；無內部函式依賴。
+ * initDeleteConfirmation：綁定刪除確認對話框；依賴 closeDeleteConfirmation、finishDeleteConfirmation、deleteEvent。
+ * initAppAlert：綁定一般提示對話框；無內部函式依賴。
+ * showAppAlert：顯示提示並等待關閉；無內部函式依賴。
+ * requestEventDelete：直接刪除或開啟確認；依賴 deleteEvent。
+ * closeDeleteConfirmation：播放關閉動畫並關閉對話框；依賴 finishClosing 回呼。
+ * finishClosing：完成刪除確認視窗的關閉動畫；由 closeDeleteConfirmation 建立及註冊；無內部函式依賴。
+ * finishDeleteConfirmation：立即完成確認對話框關閉；無內部函式依賴。
+ * deleteEvent：刪除事件並更新畫面；依賴 Events.remove、closePopover、Calendar.render。
+ * closeSearch：重設並關閉搜尋列；無內部函式依賴。
+ * initSearch：綁定搜尋、結果導覽與鍵盤操作；依賴 closeSearch、showCalendarView、showEventPopover、escapeHTML、Events.search、Events.colorHex、Calendar.setDate、Calendar.setView。
+ * escapeHTML：跳脫 HTML 特殊字元；無內部函式依賴。
+ * toLocalISO：格式化本地日期時間；依賴 pad。
+ * pad：補齊日期時間欄位數字；由 toLocalISO 呼叫；無內部函式依賴。
+ * downloadText：建立文字下載；無內部函式依賴。
+ */
 (async () => {
   await Storage.open();
   let alwaysUse24HourTime = await Storage.getSetting('alwaysUse24HourTime', false);

@@ -1,4 +1,19 @@
-/* 事件管理 — 新增、讀取、更新、刪除、提醒與衝突偵測 */
+'use strict';
+
+/*
+ * 事件快取、查詢、衝突偵測與瀏覽器通知排程。
+ * colorHex：取得顏色代碼；無內部函式依賴。
+ * load：從儲存層載入事件快取；依賴 Storage.getAllEvents。
+ * save：儲存事件並更新快取、提醒；依賴 Storage.saveEvent、load、scheduleReminders。
+ * remove：刪除事件並取消該事件提醒計時器；依賴 Storage.deleteEvent。
+ * getAll、getById、isImportant：讀取快取或判斷事件類型；無內部函式依賴。
+ * hasValidRange：檢查事件起訖時間；無內部函式依賴。
+ * getInRange：取得日期範圍內事件並展開重複事件；依賴 hasValidRange、Recurrence.expand。
+ * search：依文字搜尋事件欄位；無內部函式依賴。
+ * detectConflicts：找出與新事件重疊的事件；依賴 hasValidRange、Recurrence.expand。
+ * scheduleReminders：排程單一事件通知；依賴 hasValidRange。
+ * scheduleAllReminders：為快取中的事件排程通知；依賴 scheduleReminders。
+ */
 const Events = (() => {
   let cache = [];
 

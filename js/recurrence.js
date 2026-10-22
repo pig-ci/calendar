@@ -1,4 +1,15 @@
-/* 重複規則展開器 — 支援部分 iCalendar RRULE 規則 */
+'use strict';
+
+/*
+ * 解析 RRULE、產生易讀描述，並展開支援的重複事件日期。
+ * parseRRule：解析 RRULE 鍵值；無內部函式依賴。
+ * describe：產生重複規則描述；依賴 parseRRule。
+ * addDays、addMonths、addYears：日期遞增工具；無內部函式依賴。
+ * addWeeks：按週遞增日期；依賴 addDays。
+ * isoDate：格式化日期鍵；依賴 pad。
+ * pad：補齊日期欄位數字；由 isoDate 呼叫；無內部函式依賴。
+ * expand：展開日期範圍內的事件實例；依賴 parseRRule、addDays、addWeeks、addMonths、addYears、isoDate。
+ */
 const Recurrence = (() => {
   const DAY_MAP = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
 

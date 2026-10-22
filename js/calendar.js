@@ -1,3 +1,27 @@
+'use strict';
+
+/*
+ * 日曆狀態、日期工具與五種檢視的 DOM 渲染。
+ * setDate、getDate、setView、getView、set24HourTime：設定或讀取日曆狀態；無內部函式依賴。
+ * on：註冊事件點擊與日期點擊回呼；無內部函式依賴。
+ * navigate：依目前檢視移動日期；無內部函式依賴。
+ * titleLabel：產生導覽標題；依賴 weekStart。
+ * weekStart、startOfDay、endOfDay、sameDay、dateKey：日期計算；無內部函式依賴。
+ * eventDaySpan：計算事件跨日範圍；依賴 startOfDay、dateIndex。
+ * dateIndex：計算日期相對於範圍起點的日數；由 eventDaySpan 建立及呼叫；無內部函式依賴。
+ * isToday：判斷日期是否為今天；依賴 sameDay。
+ * fmtTime：依時間制偏好格式化時間；無內部函式依賴。
+ * renderMonth：渲染月檢視；依賴 startOfDay、endOfDay、isToday、eventDaySpan、fmtTime、Events.getInRange、Events.isImportant、Events.colorHex。
+ * renderYear：渲染年檢視；依賴 isToday。
+ * renderWeek：渲染週檢視；依賴 weekStart、isToday、eventDaySpan、sameDay、placeWeekEvents、placeWeekMultiDayEvents、renderAllDay、Events.getInRange、Events.isImportant。
+ * placeWeekMultiDayEvents：放置跨日週事件；依賴 eventDaySpan、fmtTime、Events.colorHex。
+ * renderAllDay：渲染全天事件列；依賴 eventDaySpan、createAllDayChip。
+ * createAllDayChip：建立全天事件項目；依賴 Events.colorHex。
+ * placeWeekEvents：放置單日事件並可顯示詳細資料；依賴 startOfDay、endOfDay、fmtTime、Events.colorHex。
+ * renderDay：渲染日檢視；依賴 startOfDay、endOfDay、isToday、placeWeekEvents、renderAllDay、Events.getInRange。
+ * renderAgenda：渲染議程列表；依賴 startOfDay、dateKey、isToday、fmtTime、Events.getInRange、Events.colorHex。
+ * render：切換並執行目前檢視的渲染；依賴 renderYear、renderMonth、renderWeek、renderDay、renderAgenda。
+ */
 const Calendar = (() => {
   const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
   const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];

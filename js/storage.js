@@ -1,4 +1,17 @@
-/* 儲存介接層 — 使用 IndexedDB，支援 Markdown 匯入／匯出 */
+'use strict';
+
+/*
+ * IndexedDB 存取與事件 Markdown 序列化／匯入匯出。
+ * open：開啟或建立資料庫；無內部函式依賴。
+ * tx：取得 object store；依賴 open 的資料庫狀態。
+ * promisify：將 IndexedDB request 轉為 Promise；無內部函式依賴。
+ * getAllEvents、getEvent、saveEvent、deleteEvent、clearAllEvents、getSetting、setSetting：事件與設定 CRUD；各依賴 open、tx、promisify。
+ * yamlStr：格式化 YAML 字串值；無內部函式依賴。
+ * eventToMarkdown：將事件序列化為 Markdown；依賴 yamlStr。
+ * markdownToEvent：解析 Markdown 事件；無內部函式依賴。
+ * exportAllMarkdown：匯出所有事件 Markdown；依賴 getAllEvents、eventToMarkdown。
+ * importMarkdownFiles：解析並儲存多個 Markdown 事件；依賴 markdownToEvent、saveEvent。
+ */
 const Storage = (() => {
   const DB_NAME = 'payas-days';
   const DB_VERSION = 1;

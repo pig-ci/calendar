@@ -1,4 +1,15 @@
-/* ICS／iCalendar 匯入與匯出 */
+'use strict';
+
+/*
+ * iCalendar (ICS) 日期、文字與事件的匯入／匯出轉換。
+ * pad：補齊日期時間數字；無內部函式依賴。
+ * toICSDate：轉換 ICS 日期格式；依賴 pad。
+ * escape、unescape：跳脫或還原 ICS 文字；無內部函式依賴。
+ * foldLine：依 ICS 行長限制折行；無內部函式依賴。
+ * exportICS：將事件序列化為 ICS；依賴 toICSDate、escape、foldLine。
+ * parseICSDate：將 ICS 日期轉為應用程式日期字串；無內部函式依賴。
+ * importICS：解析 ICS 並建立事件資料；依賴 parseICSDate、unescape。
+ */
 const ICS = (() => {
   function pad(n) { return String(n).padStart(2, '0'); }
 
