@@ -6,10 +6,12 @@
  * loadTheme：讀取主題設定；依賴 Storage.getSetting、applyTheme。
  * applyTheme：套用主題與圖示；無內部函式依賴。
  * updateNavDate：更新導覽日期；依賴 Calendar.titleLabel。
+ * renderCalendarAndSyncNav：先執行選用的日期／檢視更新 callback，再重繪日曆並同步標題；依賴 Calendar.render、updateNavDate；由 initNavControls、showCalendarView 與初始化流程呼叫。
  * closeMobileMenu：關閉行動選單並更新 aria 狀態；無內部函式依賴。
- * initNavControls：綁定日期、鍵盤與行動選單控制；依賴 Calendar、updateNavDate、closeMobileMenu、showCalendarView。
- * initViewButtons：綁定檢視切換；依賴 Calendar.setView、showCalendarView。
- * showCalendarView：切回日曆並重繪；依賴 setActivePageLink、Calendar.render、updateNavDate。
+ * initNavControls：綁定日期、鍵盤與行動選單控制；依賴 Calendar、renderCalendarAndSyncNav、closeMobileMenu、showCalendarView。
+ * initViewButtons：綁定檢視切換；依賴 Calendar.setView、setActiveViewButton、showCalendarView。
+ * setActiveViewButton：依 data-view 同步所有檢視按鈕的 active 與 aria-selected；由 initViewButtons、initSearch 呼叫；無內部函式依賴。
+ * showCalendarView：切回日曆並重繪；依賴 setActivePageLink、renderCalendarAndSyncNav。
  * initNavLinks：綁定頁面導覽；依賴 showPage、closeMobileMenu。
  * setActivePageLink：更新頁面連結選取狀態；無內部函式依賴。
  * showPage：顯示設定頁；依賴 renderSettingsPage、setActivePageLink、initPageActions。
@@ -44,7 +46,7 @@
  * finishDeleteConfirmation：立即完成確認對話框關閉；無內部函式依賴。
  * deleteEvent：刪除事件並更新畫面；依賴 Events.remove、closePopover、Calendar.render。
  * closeSearch：重設並關閉搜尋列；無內部函式依賴。
- * initSearch：綁定搜尋、結果導覽與鍵盤操作；依賴 closeSearch、showCalendarView、showEventPopover、escapeHTML、Events.search、Events.colorHex、Calendar.setDate、Calendar.setView。
+ * initSearch：綁定搜尋、結果導覽與鍵盤操作；依賴 closeSearch、showCalendarView、showEventPopover、setActiveViewButton、escapeHTML、Events.search、Events.colorHex、Calendar.setDate、Calendar.setView。
  * escapeHTML：跳脫 HTML 特殊字元；無內部函式依賴。
  * toLocalISO：格式化本地日期時間；依賴 pad。
  * pad：補齊日期時間欄位數字；由 toLocalISO 呼叫；無內部函式依賴。
@@ -84,8 +86,7 @@
   initPopover();
   Calendar.on('eventClick', showEventPopover);
   Calendar.on('dayClick', d => openNewEventModal(d));
-  Calendar.render();
-  updateNavDate();
+  renderCalendarAndSyncNav();
 
   /* ========================= 主題 ========================= */
   async function loadTheme() {
@@ -121,6 +122,12 @@
     const el = document.getElementById('navDateDisplay');
     if (el) el.textContent = Calendar.titleLabel();
   }
+  function renderCalendarAndSyncNav(updateCalendar) {
+    updateCalendar?.();
+    Calendar.render();
+    updateNavDate();
+  }
+
   function closeMobileMenu() {
     const mobileMenu = document.getElementById('pdMobileMenu');
     const menuBtn = document.getElementById('btnMobileMenu');
@@ -131,10 +138,10 @@
   }
 
   function initNavControls() {
-    document.getElementById('btnPrev')?.addEventListener('click', () => { Calendar.navigate(-1); Calendar.render(); updateNavDate(); });
-    document.getElementById('btnNext')?.addEventListener('click', () => { Calendar.navigate(1); Calendar.render(); updateNavDate(); });
-    document.getElementById('btnToday')?.addEventListener('click', () => { Calendar.setDate(new Date()); Calendar.render(); updateNavDate(); });
-    document.getElementById('btnTodayPill')?.addEventListener('click', () => { Calendar.setDate(new Date()); Calendar.render(); updateNavDate(); });
+    document.getElementById('btnPrev')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.navigate(-1)));
+    document.getElementById('btnNext')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.navigate(1)));
+    document.getElementById('btnToday')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.setDate(new Date())));
+    document.getElementById('btnTodayPill')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.setDate(new Date())));
     document.getElementById('brandHomeLink')?.addEventListener('click', e => { e.preventDefault(); showCalendarView(); });
 
     // 切換行動版選單
@@ -156,22 +163,26 @@
     // 鍵盤導覽：方向鍵
     document.addEventListener('keydown', ev => {
       if (ev.target.closest('input, textarea, select, [contenteditable]')) return;
-      if (ev.key === 'ArrowLeft') { Calendar.navigate(-1); Calendar.render(); updateNavDate(); }
-      if (ev.key === 'ArrowRight') { Calendar.navigate(1); Calendar.render(); updateNavDate(); }
-      if (ev.key === 't' || ev.key === 'T') { Calendar.setDate(new Date()); Calendar.render(); updateNavDate(); }
+      if (ev.key === 'ArrowLeft') renderCalendarAndSyncNav(() => Calendar.navigate(-1));
+      if (ev.key === 'ArrowRight') renderCalendarAndSyncNav(() => Calendar.navigate(1));
+      if (ev.key === 't' || ev.key === 'T') renderCalendarAndSyncNav(() => Calendar.setDate(new Date()));
     });
   }
 
   /* ========================= 檢視按鈕 ========================= */
+  function setActiveViewButton(view) {
+    document.querySelectorAll('.pd-view-btn').forEach(button => {
+      const selected = button.dataset.view === view;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-selected', String(selected));
+    });
+  }
+
   function initViewButtons() {
     document.querySelectorAll('.pd-view-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const view = btn.dataset.view;
-        document.querySelectorAll('.pd-view-btn').forEach(b => {
-          const selected = b.dataset.view === view;
-          b.classList.toggle('active', selected);
-          b.setAttribute('aria-selected', String(selected));
-        });
+        setActiveViewButton(view);
         Calendar.setView(view);
         showCalendarView();
       });
@@ -183,8 +194,7 @@
     document.getElementById('pageView').classList.add('d-none');
     document.getElementById('pageView').innerHTML = '';
     setActivePageLink(null);
-    Calendar.render();
-    updateNavDate();
+    renderCalendarAndSyncNav();
   }
 
   /* ========================= 頁面導覽連結 ========================= */
@@ -910,11 +920,7 @@
             item.addEventListener('click', () => {
               Calendar.setDate(new Date(ev.start));
               Calendar.setView('day');
-              document.querySelectorAll('.pd-view-btn').forEach(b => {
-                const selected = b.dataset.view === 'day';
-                b.classList.toggle('active', selected);
-                b.setAttribute('aria-selected', String(selected));
-              });
+              setActiveViewButton('day');
               showCalendarView();
               closeSearch();
               setTimeout(() => showEventPopover(ev.id, document.querySelector(`[data-id="${ev.id}"]`)), 200);
