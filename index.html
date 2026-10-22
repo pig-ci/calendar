@@ -353,7 +353,19 @@
     <h2 id="appAlertTitle">提示</h2>
     <p id="appAlertMessage"></p>
     <div class="pd-delete-confirm-actions">
-      <button type="button" class="btn pd-btn-primary" id="dismissAppAlert">知道了</button>
+      <button type="button" class="btn pd-btn-ghost d-none" id="cancelAppAlert">取消</button>
+      <button type="button" class="btn pd-btn-primary" id="confirmAppAlert">知道了</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- 應用程式啟動失敗 -->
+<dialog class="pd-delete-dialog" id="startupErrorDialog" aria-labelledby="startupErrorTitle" aria-describedby="startupErrorMessage">
+  <div class="pd-delete-confirm-content">
+    <h2 id="startupErrorTitle">日曆無法啟動</h2>
+    <p id="startupErrorMessage">無法存取瀏覽器本機儲存空間（IndexedDB）。請確認瀏覽器允許本機儲存，再重新載入頁面。</p>
+    <div class="pd-delete-confirm-actions">
+      <button type="button" class="btn pd-btn-primary" id="reloadAppButton"><i class="fa-solid fa-rotate-right me-1"></i>重新載入</button>
     </div>
   </div>
 </dialog>

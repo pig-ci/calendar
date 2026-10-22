@@ -2,7 +2,7 @@
 
 /*
  * 日曆狀態、日期工具與五種檢視的 DOM 渲染。
- * setDate、getDate、setView、getView、set24HourTime：設定或讀取日曆狀態；無內部函式依賴。
+ * setDate、getDate、setView、getView、set24HourTime：設定或讀取日曆狀態；setView 僅接受 VALID_VIEWS；無內部函式依賴。
  * on：註冊事件點擊與日期點擊回呼；無內部函式依賴。
  * navigate：依目前檢視移動日期；無內部函式依賴。
  * titleLabel：產生導覽標題；依賴 weekStart。
@@ -25,6 +25,7 @@
 const Calendar = (() => {
   const DAYS = ['日', '一', '二', '三', '四', '五', '六'];
   const MONTHS = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const VALID_VIEWS = new Set(['year', 'month', 'week', 'day', 'agenda']);
 
   let currentDate = new Date();
   let currentView = 'month';
@@ -34,7 +35,9 @@ const Calendar = (() => {
 
   function setDate(d) { currentDate = new Date(d); }
   function getDate() { return new Date(currentDate); }
-  function setView(v) { currentView = v; }
+  function setView(v) {
+    if (VALID_VIEWS.has(v)) currentView = v;
+  }
   function getView() { return currentView; }
   function set24HourTime(enabled) { use24HourTime = enabled; }
   function on(eventType, fn) {
@@ -427,7 +430,7 @@ const Calendar = (() => {
       el.style.top = (startMin) + 'px';
       el.style.height = durMin + 'px';
       el.style.background = Events.colorHex(ev.color);
-      el.title = ev.title;
+      el.title = ev.title || '';
       el.dataset.id = ev._masterId || ev.id;
 
       if (showDetails) {
@@ -520,8 +523,8 @@ const Calendar = (() => {
       byDay[key].push(ev);
     }
 
-    for (const [dateKey, dayEvs] of Object.entries(byDay)) {
-      const d = new Date(dateKey + 'T00:00:00');
+    for (const [dayKey, dayEvs] of Object.entries(byDay)) {
+      const d = new Date(dayKey + 'T00:00:00');
       const dayEl = document.createElement('div');
       dayEl.className = 'pd-agenda-day';
 
@@ -582,8 +585,9 @@ const Calendar = (() => {
 
     // 在週／日檢視中捲動至上午 8 點
     if (currentView === 'week' || currentView === 'day') {
+      const viewId = currentView === 'day' ? 'viewDay' : 'viewWeek';
       setTimeout(() => {
-        const wrap = document.querySelector('.pd-week-body-wrap');
+        const wrap = document.querySelector(`#${viewId} .pd-week-body-wrap`);
         if (!wrap) return;
         if (currentView === 'day') {
           const gutter = document.getElementById('dayTimeGutter');

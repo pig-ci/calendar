@@ -9,10 +9,12 @@
  * applyTheme：套用主題與圖示；無內部函式依賴。
  * updateNavDate：更新導覽日期；依賴 Calendar.titleLabel。
  * renderCalendarAndSyncNav：先執行選用的日期／檢視更新 callback，再重繪日曆並同步標題；依賴 Calendar.render、updateNavDate；由 initNavControls、showCalendarView 與初始化流程呼叫。
+ * goToday：導覽至今天並重繪日曆；依賴 renderCalendarAndSyncNav、Calendar.setDate。
+ * goRelative：依目前檢視相對移動日期並重繪日曆；依賴 renderCalendarAndSyncNav、Calendar.navigate。
  * openMobileMenu：開啟行動選單並更新 aria 狀態；無內部函式依賴。
  * closeMobileMenu：關閉行動選單並更新 aria 狀態；無內部函式依賴。
  * toggleMobileMenu：依目前狀態切換行動選單；依賴 openMobileMenu、closeMobileMenu。
- * initNavControls：綁定日期、鍵盤與行動選單控制；依賴 Calendar、renderCalendarAndSyncNav、toggleMobileMenu、closeMobileMenu、showCalendarView。
+ * initNavControls：綁定日期、鍵盤與行動選單控制；依賴 goToday、goRelative、toggleMobileMenu、closeMobileMenu、showCalendarView。
  * initViewButtons：綁定檢視切換；依賴 Calendar.setView、setActiveViewButton、showCalendarView。
  * setActiveViewButton：依 data-view 同步所有檢視按鈕的 active 與 aria-selected；由 initViewButtons、initSearch 呼叫；無內部函式依賴。
  * showCalendarView：切回日曆並重繪；依賴 setActivePageLink、renderCalendarAndSyncNav。
@@ -20,7 +22,7 @@
  * setActivePageLink：更新頁面連結選取狀態；無內部函式依賴。
  * showPage：顯示設定頁；依賴 renderSettingsPage、setActivePageLink、initPageActions。
  * renderSettingsPage：產生設定頁 HTML；無內部函式依賴。
- * initPageActions：綁定設定、匯入／匯出與清除操作；依賴 applyTheme、showAppAlert、downloadText、Storage、Events、ICS、Calendar、updateNotifBtn。
+ * initPageActions：綁定設定、匯入／匯出與清除操作；依賴 applyTheme、showAppAlert、showAppConfirm、downloadText、Storage、Events、ICS、Calendar、updateNotifBtn。
  * updateNotifBtn：更新通知權限按鈕文字與狀態；由 initPageActions 建立及呼叫；無內部函式依賴。
  * initFab：綁定快速新增按鈕；依賴 openNewEventModal。
  * initColorPicker：建立顏色選項並綁定選取；依賴 Events.EVENT_COLORS、setSelectedColor。
@@ -38,7 +40,7 @@
  * updateEventEndMin：更新結束時間下限；依賴 toLocalISO。
  * resetForm：重設事件表單；依賴 toggleAllDay、setSelectedColor、getUserTimezone。
  * saveEventFromForm：防止重複提交並管理儲存狀態；依賴 saveEventData、showAppAlert。
- * saveEventData：驗證並儲存事件；依賴 showAppAlert、getSelectedColor、getTagValues、UNTITLED_EVENT_TITLE、Events.detectConflicts、Events.save、hideEventModal、Calendar.render。
+ * saveEventData：驗證並儲存事件；依賴 showAppAlert、showAppConfirm、getSelectedColor、getTagValues、UNTITLED_EVENT_TITLE、Events.detectConflicts、Events.save、hideEventModal、Calendar.render。
  * addTagToList：新增標籤項目；無內部函式依賴。
  * renderTagList：重建標籤清單；依賴 addTagToList。
  * getTagValues：讀取標籤值；無內部函式依賴。
@@ -46,14 +48,17 @@
  * showEventPopover：填入並定位事件快顯視窗；依賴 UNTITLED_EVENT_TITLE、Events.getById、Events.colorHex、Calendar.fmtTime、Recurrence.describe、escapeHTML。
  * closePopover：隱藏事件快顯視窗；無內部函式依賴。
  * initDeleteConfirmation：綁定刪除確認對話框；依賴 closeDeleteConfirmation、finishDeleteConfirmation、deleteEvent。
- * initAppAlert：綁定一般提示對話框；無內部函式依賴。
- * showAppAlert：顯示提示並等待關閉；無內部函式依賴。
+ * initAppAlert：綁定共用提示／確認對話框按鈕與關閉事件；依賴 showNextAppDialog。
+ * showAppAlert：將提示加入共用對話框佇列並等待關閉；依賴 enqueueAppDialog。
+ * showAppConfirm：將確認訊息加入佇列並回傳使用者選擇；依賴 enqueueAppDialog。
+ * enqueueAppDialog：建立 Promise 並排入提示／確認佇列；依賴 showNextAppDialog。
+ * showNextAppDialog：顯示佇列中的下一個提示或確認；無內部函式依賴。
  * requestEventDelete：直接刪除或開啟確認；依賴 deleteEvent。
  * closeDeleteConfirmation：播放關閉動畫並關閉對話框；依賴 finishClosing 回呼。
  * finishClosing：完成刪除確認視窗的關閉動畫；由 closeDeleteConfirmation 建立及註冊；無內部函式依賴。
  * finishDeleteConfirmation：立即完成確認對話框關閉；無內部函式依賴。
  * deleteEvent：刪除事件並更新畫面；依賴 Events.remove、hideEventModal、closePopover、Calendar.render。
- * initSearch：快取搜尋介面節點並綁定搜尋、結果導覽與鍵盤操作；依賴 openSearchBar、closeSearch、showCalendarView、showEventPopover、setActiveViewButton、escapeHTML、escapeEventTitle、Events.search、Events.colorHex、Calendar.setDate、Calendar.setView。
+ * initSearch：快取搜尋介面節點並綁定搜尋、結果導覽與鍵盤操作；必要節點缺失時警告並略過；依賴 openSearchBar、closeSearch、showCalendarView、showEventPopover、setActiveViewButton、escapeHTML、escapeEventTitle、Events.search、Events.colorHex、Calendar.setDate、Calendar.setView。
  * openSearchBar、closeSearch：initSearch 內的搜尋列開啟／關閉 helper，共用快取的 bar、btn、input、results 節點；openSearchBar 延遲 focus input，closeSearch 清空搜尋結果。
  * escapeHTML：跳脫 HTML 特殊字元；無內部函式依賴。
  * escapeEventTitle：為事件標題補上預設值並跳脫 HTML；依賴 UNTITLED_EVENT_TITLE、escapeHTML。
@@ -141,6 +146,14 @@
     updateNavDate();
   }
 
+  function goToday() {
+    renderCalendarAndSyncNav(() => Calendar.setDate(new Date()));
+  }
+
+  function goRelative(step) {
+    renderCalendarAndSyncNav(() => Calendar.navigate(step));
+  }
+
   function openMobileMenu() {
     const mobileMenu = document.getElementById('pdMobileMenu');
     const menuBtn = document.getElementById('btnMobileMenu');
@@ -167,10 +180,10 @@
   }
 
   function initNavControls() {
-    $('btnPrev')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.navigate(-1)));
-    $('btnNext')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.navigate(1)));
-    $('btnToday')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.setDate(new Date())));
-    $('btnTodayPill')?.addEventListener('click', () => renderCalendarAndSyncNav(() => Calendar.setDate(new Date())));
+    $('btnPrev')?.addEventListener('click', () => goRelative(-1));
+    $('btnNext')?.addEventListener('click', () => goRelative(1));
+    $('btnToday')?.addEventListener('click', goToday);
+    $('btnTodayPill')?.addEventListener('click', goToday);
     $('brandHomeLink')?.addEventListener('click', e => { e.preventDefault(); showCalendarView(); });
 
     // 切換行動版選單
@@ -187,9 +200,9 @@
     // 鍵盤導覽：方向鍵
     document.addEventListener('keydown', ev => {
       if (ev.target.closest('input, textarea, select, [contenteditable]')) return;
-      if (ev.key === 'ArrowLeft') renderCalendarAndSyncNav(() => Calendar.navigate(-1));
-      if (ev.key === 'ArrowRight') renderCalendarAndSyncNav(() => Calendar.navigate(1));
-      if (ev.key === 't' || ev.key === 'T') renderCalendarAndSyncNav(() => Calendar.setDate(new Date()));
+      if (ev.key === 'ArrowLeft') goRelative(-1);
+      if (ev.key === 'ArrowRight') goRelative(1);
+      if (ev.key === 't' || ev.key === 'T') goToday();
     });
   }
 
@@ -401,7 +414,7 @@
       });
       // 全部清除
       $('btnClearAll')?.addEventListener('click', async () => {
-        if (!confirm('確定要刪除所有事件嗎？此操作無法復原。')) return;
+        if (!await showAppConfirm('確定要刪除所有事件嗎？此操作無法復原。')) return;
         await Storage.clearAllEvents();
         await Events.load();
         await showAppAlert('所有事件已刪除。');
@@ -467,6 +480,8 @@
   let editingEventId = null;
   let pendingDeleteEventId = null;
   let isSavingEvent = false;
+  let pendingAppDialogs = [];
+  let activeAppDialog = null;
 
   function eventModalInstance() {
     return bootstrap.Modal.getOrCreateInstance(document.getElementById('eventModal'));
@@ -715,7 +730,7 @@
     const conflicts = Events.detectConflicts(ev);
     if (conflicts.length > 0) {
       const names = conflicts.map(c => c.title || UNTITLED_EVENT_TITLE).join('、');
-      if (!confirm(`此事件與下列事件時間重疊：${names}。仍要儲存嗎？`)) return;
+      if (!await showAppConfirm(`此事件與下列事件時間重疊：${names}。仍要儲存嗎？`)) return;
     }
 
     await Events.save(ev);
@@ -839,17 +854,52 @@
   }
 
   function initAppAlert() {
-    const dialog = document.getElementById('appAlert');
-    $('dismissAppAlert')?.addEventListener('click', () => dialog.close());
+    const dialog = $('appAlert');
+    $('confirmAppAlert')?.addEventListener('click', () => dialog.close('confirm'));
+    $('cancelAppAlert')?.addEventListener('click', () => dialog.close('cancel'));
+    dialog.addEventListener('cancel', event => {
+      event.preventDefault();
+      dialog.close('cancel');
+    });
+    dialog.addEventListener('close', () => {
+      const activeDialog = activeAppDialog;
+      activeAppDialog = null;
+      if (activeDialog) {
+        activeDialog.resolve(activeDialog.type === 'confirm'
+          ? dialog.returnValue === 'confirm'
+          : undefined);
+      }
+      showNextAppDialog();
+    });
   }
 
   function showAppAlert(message) {
-    const dialog = document.getElementById('appAlert');
-    document.getElementById('appAlertMessage').textContent = message;
+    return enqueueAppDialog('alert', message);
+  }
+
+  function showAppConfirm(message) {
+    return enqueueAppDialog('confirm', message);
+  }
+
+  function enqueueAppDialog(type, message) {
     return new Promise(resolve => {
-      dialog.addEventListener('close', resolve, { once: true });
-      dialog.showModal();
+      pendingAppDialogs.push({ type, message, resolve });
+      showNextAppDialog();
     });
+  }
+
+  function showNextAppDialog() {
+    const dialog = $('appAlert');
+    if (!dialog || dialog.open || activeAppDialog || pendingAppDialogs.length === 0) return;
+
+    const { type, message, resolve } = pendingAppDialogs.shift();
+    $('appAlertTitle').textContent = type === 'confirm' ? '確認' : '提示';
+    $('appAlertMessage').textContent = message;
+    $('cancelAppAlert').classList.toggle('d-none', type !== 'confirm');
+    $('confirmAppAlert').textContent = type === 'confirm' ? '確定' : '知道了';
+    dialog.returnValue = '';
+    activeAppDialog = { type, resolve };
+    dialog.showModal();
   }
 
   async function requestEventDelete(id, skipConfirmation) {
@@ -894,10 +944,14 @@
 
   /* ========================= 搜尋 ========================= */
   function initSearch() {
-    const btn = document.getElementById('btnSearch');
-    const bar = document.getElementById('searchBar');
-    const input = document.getElementById('searchInput');
-    const results = document.getElementById('searchResults');
+    const btn = $('btnSearch');
+    const bar = $('searchBar');
+    const input = $('searchInput');
+    const results = $('searchResults');
+    if (!btn || !bar || !input || !results) {
+      console.warn('搜尋功能初始化略過：缺少必要的 DOM 元素。');
+      return;
+    }
 
     function openSearchBar() {
       bar.classList.add('open');
@@ -991,4 +1045,11 @@
 
 })().catch(error => {
   console.warn('Payas Days 初始化失敗：', error);
+  const dialog = document.getElementById('startupErrorDialog');
+  const reloadButton = document.getElementById('reloadAppButton');
+  reloadButton?.addEventListener('click', () => window.location.reload(), { once: true });
+  if (dialog && !dialog.open) {
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    else dialog.setAttribute('open', '');
+  }
 });
