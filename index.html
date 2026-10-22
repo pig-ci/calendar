@@ -281,7 +281,7 @@
             <div id="reminderList" class="d-flex flex-wrap gap-2 mb-2"></div>
             <div class="input-group input-group-sm" style="max-width:260px">
               <input type="number" class="form-control pd-input" id="reminderMinutes" placeholder="提前幾分鐘" min="1" />
-              <button type="button" class="btn pd-btn-ghost" id="btnAddReminder"><i class="fa-solid fa-plus"></i>新增</button>
+              <button type="button" class="btn pd-btn pd-btn-ghost" id="btnAddReminder"><i class="fa-solid fa-plus"></i>新增</button>
             </div>
           </div>
 
@@ -291,7 +291,7 @@
             <div id="attendeeList" class="d-flex flex-wrap gap-2 mb-2"></div>
             <div class="input-group input-group-sm" style="max-width:320px">
               <input type="email" class="form-control pd-input" id="attendeeInput" placeholder="電子郵件地址" />
-              <button type="button" class="btn pd-btn-ghost" id="btnAddAttendee"><i class="fa-solid fa-plus"></i>新增</button>
+              <button type="button" class="btn pd-btn pd-btn-ghost" id="btnAddAttendee"><i class="fa-solid fa-plus"></i>新增</button>
             </div>
           </div>
 
@@ -301,18 +301,18 @@
             <div id="attachmentList" class="d-flex flex-wrap gap-2 mb-2"></div>
             <div class="input-group input-group-sm" style="max-width:400px">
               <input type="url" class="form-control pd-input" id="attachmentInput" placeholder="https://…" />
-              <button type="button" class="btn pd-btn-ghost" id="btnAddAttachment"><i class="fa-solid fa-plus"></i>新增</button>
+              <button type="button" class="btn pd-btn pd-btn-ghost" id="btnAddAttachment"><i class="fa-solid fa-plus"></i>新增</button>
             </div>
           </div>
         </form>
       </div>
       <div class="modal-footer pd-modal-footer">
         <div class="me-auto d-flex gap-2">
-          <button type="button" class="btn pd-btn-ghost d-none" id="btnExportEvent" title="匯出為 .md"><i class="fa-solid fa-file-export me-1"></i>匯出 .md</button>
-          <button type="button" class="btn pd-btn-danger d-none" id="btnDeleteEvent" title="按住 Shift 點擊可直接刪除"><i class="fa-solid fa-trash me-1"></i>刪除</button>
+          <button type="button" class="btn pd-btn pd-btn-ghost d-none" id="btnExportEvent" title="匯出為 .md"><i class="fa-solid fa-file-export me-1"></i>匯出 .md</button>
+          <button type="button" class="btn pd-btn pd-btn-danger d-none" id="btnDeleteEvent" title="按住 Shift 點擊可直接刪除"><i class="fa-solid fa-trash me-1"></i>刪除</button>
         </div>
-        <button type="button" class="btn pd-btn-ghost" data-bs-dismiss="modal">取消</button>
-        <button type="button" class="btn pd-btn-primary" id="btnSaveEvent" aria-busy="false">
+        <button type="button" class="btn pd-btn pd-btn-ghost" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn pd-btn pd-btn-primary" id="btnSaveEvent" aria-busy="false">
           <span class="spinner-border spinner-border-sm me-1 d-none" aria-hidden="true"></span>
           <i class="fa-solid fa-floppy-disk me-1"></i>儲存
         </button>
@@ -341,8 +341,8 @@
     <h2 id="deleteConfirmTitle"><i class="fa-solid fa-triangle-exclamation me-2"></i>刪除事件</h2>
     <p id="deleteConfirmMessage">確定要刪除此事件嗎？此操作無法復原。</p>
     <div class="pd-delete-confirm-actions">
-      <button type="button" class="btn pd-btn-ghost" id="cancelDeleteEvent">取消</button>
-      <button type="button" class="btn pd-btn-danger" id="confirmDeleteEvent"><i class="fa-solid fa-trash me-1"></i>刪除</button>
+      <button type="button" class="btn pd-btn pd-btn-ghost" id="cancelDeleteEvent">取消</button>
+      <button type="button" class="btn pd-btn pd-btn-danger" id="confirmDeleteEvent"><i class="fa-solid fa-trash me-1"></i>刪除</button>
     </div>
   </div>
 </dialog>
@@ -353,8 +353,8 @@
     <h2 id="appAlertTitle">提示</h2>
     <p id="appAlertMessage"></p>
     <div class="pd-delete-confirm-actions">
-      <button type="button" class="btn pd-btn-ghost d-none" id="cancelAppAlert">取消</button>
-      <button type="button" class="btn pd-btn-primary" id="confirmAppAlert">知道了</button>
+      <button type="button" class="btn pd-btn pd-btn-ghost d-none" id="cancelAppAlert">取消</button>
+      <button type="button" class="btn pd-btn pd-btn-primary" id="confirmAppAlert">知道了</button>
     </div>
   </div>
 </dialog>
@@ -365,7 +365,7 @@
     <h2 id="startupErrorTitle">日曆無法啟動</h2>
     <p id="startupErrorMessage">無法存取瀏覽器本機儲存空間（IndexedDB）。請確認瀏覽器允許本機儲存，再重新載入頁面。</p>
     <div class="pd-delete-confirm-actions">
-      <button type="button" class="btn pd-btn-primary" id="reloadAppButton"><i class="fa-solid fa-rotate-right me-1"></i>重新載入</button>
+      <button type="button" class="btn pd-btn pd-btn-primary" id="reloadAppButton"><i class="fa-solid fa-rotate-right me-1"></i>重新載入</button>
     </div>
   </div>
 </dialog>

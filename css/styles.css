@@ -23,26 +23,12 @@
   --scrollbar:     #ccc8bc;
   --danger:        #dc2626;
 
-  /* 舊版別名 — 保留供日曆專用類別使用 */
-  --pd-bg:              var(--bg-app);
-  --pd-bg-secondary:    var(--bg-sidebar);
-  --pd-bg-tertiary:     var(--bg-hover);
-  --pd-surface:         var(--bg-surface);
-  --pd-surface-hover:   var(--bg-hover);
+  /* 舊版別名 — 保留供 CSS 與 JavaScript 內嵌樣式使用 */
   --pd-border:          var(--border);
-  --pd-text:            var(--text-1);
-  --pd-text-secondary:  var(--text-2);
   --pd-text-muted:      var(--text-3);
   --pd-accent:          var(--accent);
-  --pd-accent-hover:    var(--accent-dk);
-  --pd-accent-light:    var(--accent-dim);
   --pd-today-bg:        #eef8f3;
-  --pd-today-text:      var(--accent);
-  --pd-today-border:    var(--accent-lt);
-  --pd-shadow:          var(--shadow);
-  --pd-shadow-lg:       var(--shadow-lg);
   --pd-radius:          7px;
-  --pd-radius-sm:       5px;
   --pd-radius-lg:       12px;
   --pd-font:            'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --pd-font-mono:       'JetBrains Mono', 'Fira Mono', monospace;
@@ -73,7 +59,6 @@
   --danger:        #ef4444;
 
   --pd-today-bg:   #0d2118;
-  --pd-today-text: var(--accent-lt);
 }
 
 /* ══════════════════════════════════════
@@ -394,69 +379,68 @@ body {
 .pd-search-result-item:last-child { border-bottom: none; }
 
 /* ══════════════════════════════════════
-   共用對話框按鈕
-   在版面屬性上使用 !important 覆寫 Bootstrap .btn／.btn-sm 的優先順序
+   共用按鈕基底與對話框按鈕變體
+   Bootstrap 5.3 外觀透過 --bs-btn-* 變數設定
 ══════════════════════════════════════ */
-.pd-btn-ghost {
-  height: 28px !important;
-  padding: 0 10px !important;
-  background: none !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 5px !important;
-  font-family: var(--pd-font) !important;
-  font-size: 12.5px !important;
-  color: var(--text-2) !important;
+.pd-btn {
+  --bs-btn-padding-y: 0;
+  --bs-btn-padding-x: 10px;
+  --bs-btn-font-family: var(--pd-font);
+  --bs-btn-font-size: 12.5px;
+  --bs-btn-line-height: 1;
+  --bs-btn-border-width: 1px;
+  --bs-btn-border-radius: 5px;
+  --bs-btn-box-shadow: none;
+  --bs-btn-active-shadow: none;
+  --bs-btn-focus-box-shadow: none;
+
+  height: 28px;
   cursor: pointer;
-  transition: background var(--pd-transition), color var(--pd-transition);
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px;
-  box-shadow: none !important;
-  line-height: 1 !important;
+  transition: background var(--pd-transition), color var(--pd-transition), border-color var(--pd-transition);
 }
-.pd-btn-ghost:hover { background: var(--bg-hover) !important; color: var(--text-1) !important; }
-.pd-btn-ghost:focus { box-shadow: none !important; }
+.btn.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pd-btn-ghost {
+  --bs-btn-color: var(--text-2);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--border);
+  --bs-btn-hover-color: var(--text-1);
+  --bs-btn-hover-bg: var(--bg-hover);
+  --bs-btn-hover-border-color: var(--border);
+  --bs-btn-active-color: var(--text-1);
+  --bs-btn-active-bg: var(--bg-hover);
+  --bs-btn-active-border-color: var(--border);
+}
 
 .pd-btn-primary {
-  height: 28px !important;
-  padding: 0 12px !important;
-  background: var(--accent) !important;
-  border: 1px solid var(--accent) !important;
-  border-radius: 5px !important;
-  font-family: var(--pd-font) !important;
-  font-size: 12.5px !important;
-  font-weight: 500 !important;
-  color: #fff !important;
-  cursor: pointer;
-  transition: background var(--pd-transition), border-color var(--pd-transition);
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px;
-  box-shadow: none !important;
-  line-height: 1 !important;
+  --bs-btn-padding-x: 12px;
+  --bs-btn-font-weight: 500;
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--accent);
+  --bs-btn-border-color: var(--accent);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--accent-dk);
+  --bs-btn-hover-border-color: var(--accent-dk);
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--accent-dk);
+  --bs-btn-active-border-color: var(--accent-dk);
 }
-.pd-btn-primary:hover { background: var(--accent-dk) !important; border-color: var(--accent-dk) !important; }
-.pd-btn-primary:focus { box-shadow: none !important; }
 
 .pd-btn-danger {
-  height: 28px !important;
-  padding: 0 10px !important;
-  background: none !important;
-  border: 1px solid var(--danger) !important;
-  border-radius: 5px !important;
-  font-family: var(--pd-font) !important;
-  font-size: 12.5px !important;
-  color: var(--danger) !important;
-  cursor: pointer;
-  transition: background var(--pd-transition);
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px;
-  box-shadow: none !important;
-  line-height: 1 !important;
+  --bs-btn-color: var(--danger);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-color: var(--danger);
+  --bs-btn-hover-color: var(--danger);
+  --bs-btn-hover-bg: rgba(220,38,38,.08);
+  --bs-btn-hover-border-color: var(--danger);
+  --bs-btn-active-color: var(--danger);
+  --bs-btn-active-bg: rgba(220,38,38,.08);
+  --bs-btn-active-border-color: var(--danger);
 }
-.pd-btn-danger:hover { background: rgba(220,38,38,.08) !important; }
-.pd-btn-danger:focus { box-shadow: none !important; }
 
 /* 僅含圖示的別名，供快顯視窗使用 */
 .pd-btn-icon {
@@ -1277,8 +1261,8 @@ body {
   border-color: var(--accent);
 }
 #setting24HourTime:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+  background-color: var(--accent);
+  border-color: var(--accent);
 }
 #setting24HourTime:not(:checked) {
   background-color: var(--text-3);

@@ -289,16 +289,16 @@ const $ = id => document.getElementById(id);
       <h3>通知</h3>
       <div class="pd-setting-row">
         <div><div class="pd-setting-label">瀏覽器通知</div><div class="pd-setting-sub">需要授予瀏覽器通知權限</div></div>
-        <button class="btn pd-btn-ghost" id="btnRequestNotif"><i class="fa-solid fa-bell me-1"></i>啟用</button>
+        <button class="btn pd-btn pd-btn-ghost" id="btnRequestNotif"><i class="fa-solid fa-bell me-1"></i>啟用</button>
       </div>
 
       <h3>匯入與匯出</h3>
       <div class="row g-3 mb-3">
         <div class="col-sm-6">
-          <button class="btn pd-btn-ghost w-100" id="btnExportICS"><i class="fa-solid fa-file-export me-1"></i>匯出 ICS</button>
+          <button class="btn pd-btn pd-btn-ghost w-100" id="btnExportICS"><i class="fa-solid fa-file-export me-1"></i>匯出 ICS</button>
         </div>
         <div class="col-sm-6">
-          <button class="btn pd-btn-ghost w-100" id="btnExportMD"><i class="fa-solid fa-file-export me-1"></i>匯出 Markdown 檔案集</button>
+          <button class="btn pd-btn pd-btn-ghost w-100" id="btnExportMD"><i class="fa-solid fa-file-export me-1"></i>匯出 Markdown 檔案集</button>
         </div>
         <div class="col-sm-6">
           <label class="pd-import-area w-100" id="importICSLabel">
@@ -319,7 +319,7 @@ const $ = id => document.getElementById(id);
       <h3>危險操作</h3>
       <div class="pd-setting-row">
         <div><div class="pd-setting-label" style="color:#dc2626">刪除所有事件</div><div class="pd-setting-sub">此操作無法復原</div></div>
-        <button class="btn pd-btn-danger" id="btnClearAll">全部清除</button>
+        <button class="btn pd-btn pd-btn-danger" id="btnClearAll">全部清除</button>
       </div>
     </div>`;
   }
