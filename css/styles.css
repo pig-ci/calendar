@@ -22,6 +22,8 @@
   --shadow-lg:     0 16px 56px rgba(0,0,0,.14);
   --scrollbar:     #ccc8bc;
   --danger:        #dc2626;
+  --pd-row-stripe: rgba(0,0,0,.012);
+  --pd-fab-shadow: 0 4px 14px rgba(45,106,79,.35);
 
   /* 舊版別名 — 保留供 CSS 與 JavaScript 內嵌樣式使用 */
   --pd-border:          var(--border);
@@ -34,6 +36,8 @@
   --pd-font-mono:       'JetBrains Mono', 'Fira Mono', monospace;
   --pd-font-brand:      'Fraunces', Georgia, serif;
   --pd-transition:      0.13s ease;
+  --pd-transition-btn:  background var(--pd-transition), color var(--pd-transition), transform .09s;
+  --pd-transition-fade: background var(--pd-transition), color var(--pd-transition);
 }
 
 [data-theme="dark"] {
@@ -57,6 +61,8 @@
   --shadow-lg:     0 16px 56px rgba(0,0,0,.6);
   --scrollbar:     #333330;
   --danger:        #ef4444;
+  --pd-row-stripe: rgba(255,255,255,.012);
+  --pd-fab-shadow: 0 4px 14px rgba(82,183,136,.28);
 
   --pd-today-bg:   #0d2118;
 }
@@ -120,7 +126,7 @@ body {
   text-decoration: none;
   padding: 3px 7px;
   border-radius: 5px;
-  transition: background var(--pd-transition);
+  transition: var(--pd-transition-fade);
   flex-shrink: 0;
 }
 .pd-brand:hover { background: var(--bg-hover); }
@@ -152,7 +158,7 @@ body {
   color: var(--text-3);
   cursor: pointer;
   font-size: 12px;
-  transition: background var(--pd-transition), color var(--pd-transition), transform .09s;
+  transition: var(--pd-transition-btn);
   flex-shrink: 0;
 }
 .pd-arrow-btn:hover { background: var(--bg-hover); color: var(--text-1); }
@@ -168,7 +174,7 @@ body {
   font-weight: 600;
   color: var(--text-1);
   cursor: pointer;
-  transition: background var(--pd-transition), color var(--pd-transition);
+  transition: var(--pd-transition-fade);
   white-space: nowrap;
   letter-spacing: -.01em;
 }
@@ -198,7 +204,7 @@ body {
   font-size: 13px;
   font-family: var(--pd-font);
   text-decoration: none;
-  transition: background var(--pd-transition), color var(--pd-transition), transform .09s;
+  transition: var(--pd-transition-btn);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -403,6 +409,10 @@ body {
   align-items: center;
   gap: 4px;
 }
+.btn.pd-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 .pd-btn-ghost {
   --bs-btn-color: var(--text-2);
@@ -455,7 +465,7 @@ body {
   color: var(--text-3);
   cursor: pointer;
   font-size: 13px;
-  transition: background var(--pd-transition), color var(--pd-transition), transform .09s;
+  transition: var(--pd-transition-btn);
 }
 .pd-btn-icon:hover { background: var(--bg-hover); color: var(--text-1); }
 .pd-btn-icon:active { transform: scale(.91); }
@@ -724,8 +734,7 @@ body {
 .pd-day-column { flex: 1; border-right: 1px solid var(--border); position: relative; min-height: 1440px; contain: layout style; }
 .pd-day-column:last-child { border-right: none; }
 .pd-time-line { height: 60px; border-bottom: 1px solid var(--border); position: relative; }
-.pd-time-line:nth-child(even) { background: rgba(0,0,0,.012); }
-[data-theme="dark"] .pd-time-line:nth-child(even) { background: rgba(255,255,255,.012); }
+.pd-time-line:nth-child(even) { background: var(--pd-row-stripe); }
 
 .pd-week-event {
   position: absolute;
@@ -884,7 +893,7 @@ body {
   color: #fff;
   border: none;
   font-size: 1.2rem;
-  box-shadow: 0 4px 14px rgba(45,106,79,.35);
+  box-shadow: var(--pd-fab-shadow);
   z-index: 1040;
   display: flex;
   align-items: center;
@@ -898,8 +907,6 @@ body {
   transform: scale(1.07);
   box-shadow: 0 6px 20px rgba(45,106,79,.45);
 }
-[data-theme="dark"] .pd-fab { box-shadow: 0 4px 14px rgba(82,183,136,.28); }
-
 /* ══════════════════════════════════════
    事件快顯視窗
 ══════════════════════════════════════ */
@@ -981,9 +988,10 @@ body {
   to { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .pd-delete-dialog[open],
-  .pd-delete-dialog::backdrop {
-    animation-duration: 1ms;
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
   }
 }
 .pd-delete-confirm-content {
